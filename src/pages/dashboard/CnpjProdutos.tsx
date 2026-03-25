@@ -343,10 +343,9 @@ const getStoreHighlightLabelFromTags = (tagsValue?: string | null) => {
 };
 
 const CnpjProdutos = () => {
-  const { profile, user } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const isAdmin = profile?.user_role === 'admin';
   const showManagementSection = location.pathname === '/dashboard/cnpj-gerenciamento-produtos';
 
   const [produtos, setProdutos] = useState<CnpjProduto[]>([]);
@@ -429,15 +428,6 @@ const CnpjProdutos = () => {
   useEffect(() => {
     loadProdutos();
   }, [loadProdutos]);
-
-  const resumo = useMemo(() => {
-    const total = produtos.length;
-    const ativos = produtos.filter((p) => p.status === 'ativo').length;
-    const rascunho = produtos.filter((p) => p.status === 'rascunho').length;
-    const baixoEstoque = produtos.filter((p) => (p.controlar_estoque === true || p.controlar_estoque === 1) && p.estoque <= 5).length;
-
-    return { total, ativos, rascunho, baixoEstoque };
-  }, [produtos]);
 
   const taxonomyLabels: Record<TaxonomyKey, string> = {
     categories: 'categorias',
