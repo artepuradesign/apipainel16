@@ -42,7 +42,7 @@ class CnpjProdutos extends BaseModel {
         }
 
         $whereSql = 'WHERE ' . implode(' AND ', $where);
-        $query = "SELECT p.*, u.full_name AS owner_name
+        $query = "SELECT p.*, u.full_name AS owner_name, u.cnpj AS owner_cnpj
                   FROM {$this->table} p
                   LEFT JOIN users u ON u.id = p.user_id
                   {$whereSql}
@@ -99,7 +99,7 @@ class CnpjProdutos extends BaseModel {
     }
 
     public function findByIdForUser(int $id, int $userId, bool $isAdmin): ?array {
-        $query = "SELECT p.*, u.full_name AS owner_name
+        $query = "SELECT p.*, u.full_name AS owner_name, u.cnpj AS owner_cnpj
                   FROM {$this->table} p
                   LEFT JOIN users u ON u.id = p.user_id
                   WHERE p.id = ? AND p.ativo = 1";
@@ -120,7 +120,7 @@ class CnpjProdutos extends BaseModel {
     }
 
     public function findPublicById(int $id): ?array {
-        $query = "SELECT p.*, u.full_name AS owner_name
+        $query = "SELECT p.*, u.full_name AS owner_name, u.cnpj AS owner_cnpj
                   FROM {$this->table} p
                   LEFT JOIN users u ON u.id = p.user_id
                   WHERE p.id = ?
@@ -141,7 +141,7 @@ class CnpjProdutos extends BaseModel {
             return null;
         }
 
-        $query = "SELECT p.*, u.full_name AS owner_name
+        $query = "SELECT p.*, u.full_name AS owner_name, u.cnpj AS owner_cnpj
                   FROM {$this->table} p
                   LEFT JOIN users u ON u.id = p.user_id
                   WHERE p.ativo = 1
