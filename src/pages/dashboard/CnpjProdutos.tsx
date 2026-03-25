@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { z } from 'zod';
 import { Package, Plus, RefreshCw, Pencil, Trash2, Search, ScanLine, ExternalLink } from 'lucide-react';
-import DashboardTitleCard from '@/components/dashboard/DashboardTitleCard';
+import { useNavigate } from 'react-router-dom';
+import SimpleTitleBar from '@/components/dashboard/SimpleTitleBar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -300,6 +301,7 @@ const removeCommaValue = (value: string, target: string) =>
 
 const CnpjProdutos = () => {
   const { profile, user } = useAuth();
+  const navigate = useNavigate();
   const isAdmin = profile?.user_role === 'admin';
 
   const [produtos, setProdutos] = useState<CnpjProduto[]>([]);
@@ -832,7 +834,7 @@ const CnpjProdutos = () => {
 
   return (
     <div className="space-y-4 sm:space-y-6 px-1 sm:px-0 max-w-full overflow-x-hidden [&_label]:text-[13px] sm:[&_label]:text-sm [&_input]:text-sm [&_textarea]:text-sm">
-      <DashboardTitleCard
+      <SimpleTitleBar
         title="CNPJ Produtos"
         subtitle="Controle completo de produtos das empresas"
         icon={<Package className="h-4 w-4 sm:h-5 sm:w-5" />}
@@ -846,6 +848,7 @@ const CnpjProdutos = () => {
             </Button>
           </>
         }
+        onBack={() => navigate('/dashboard')}
       />
 
       <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_380px] 2xl:grid-cols-[minmax(0,1fr)_420px] gap-4 sm:gap-6">
