@@ -151,7 +151,7 @@ export const serviceModules = [
     title: "CNPJ PRODUTOS",
     description: "Administração completa de produtos por CNPJ",
     icon: Package,
-    path: "/dashboard/cnpj-produtos",
+    path: "/dashboard/cnpj-gerenciamento-produtos",
     price: "2,00"
   }
 ];
