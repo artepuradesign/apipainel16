@@ -75,6 +75,39 @@ class CnpjProdutosController {
         }
     }
 
+    public function lojaPublica() {
+        try {
+            $cnpjDigits = preg_replace('/\D+/', '', (string)($_GET['cnpj'] ?? ''));
+            if (strlen($cnpjDigits) !== 14) {
+                Response::error('CNPJ inválido', 400);
+                return;
+            }
+
+            $produtos = $this->model->listPublicByCnpj($cnpjDigits, 120);
+            $produtos = array_map([$this, 'normalizeProdutoRow'], $produtos);
+
+            $storeMeta = $this->model->findPublicStoreMetaByCnpj($cnpjDigits);
+            $nomeEmpresa = !empty($storeMeta['nome_empresa'])
+                ? mb_substr(trim((string)$storeMeta['nome_empresa']), 0, 255)
+                : (!empty($produtos[0]['nome_empresa']) ? (string)$produtos[0]['nome_empresa'] : null);
+
+            $logoUrl = !empty($storeMeta['owner_avatar_url'])
+                ? mb_substr(trim((string)$storeMeta['owner_avatar_url']), 0, 2048)
+                : (!empty($produtos[0]['owner_avatar_url']) ? (string)$produtos[0]['owner_avatar_url'] : null);
+
+            Response::success([
+                'empresa' => [
+                    'nome_empresa' => $nomeEmpresa,
+                    'cnpj' => $this->formatCnpj($cnpjDigits),
+                    'avatar_url' => $logoUrl ?: null,
+                ],
+                'produtos' => $produtos,
+            ], 'Loja pública carregada com sucesso');
+        } catch (Exception $e) {
+            Response::error('Erro ao carregar loja pública: ' . $e->getMessage(), 500);
+        }
+    }
+
     public function criar() {
         try {
             $userId = (int)(AuthMiddleware::getCurrentUserId() ?? 0);
@@ -594,6 +627,7 @@ class CnpjProdutosController {
         $row['tags'] = !empty($row['tags']) ? (string)$row['tags'] : null;
         $row['marca'] = !empty($row['marca']) ? (string)$row['marca'] : null;
         $row['owner_name'] = !empty($row['owner_name']) ? mb_substr(trim((string)$row['owner_name']), 0, 255) : null;
+        $row['owner_avatar_url'] = !empty($row['owner_avatar_url']) ? mb_substr(trim((string)$row['owner_avatar_url']), 0, 2048) : null;
         $ownerCnpjDigits = preg_replace('/\D+/', '', (string)($row['owner_cnpj'] ?? ''));
         $row['owner_cnpj'] = strlen($ownerCnpjDigits) === 14 ? $this->formatCnpj($ownerCnpjDigits) : null;
 
