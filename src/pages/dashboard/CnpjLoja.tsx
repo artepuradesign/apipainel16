@@ -4,12 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import SimpleTitleBar from '@/components/dashboard/SimpleTitleBar';
-import { Store, ShoppingBag, Star, Eye, Pencil, Trash2 } from 'lucide-react';
+import { ShoppingBag, Star, Eye, Pencil, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { cnpjProdutosService, type CnpjProduto } from '@/services/cnpjProdutosService';
 import { normalizeProductPhotos, splitStoreSections, STORE_HIGHLIGHT_LABELS, getHighlightFromTags } from '@/components/cnpj-loja/storefrontUtils';
 import { toast } from 'sonner';
+import { useApiModules } from '@/hooks/useApiModules';
 
 const formatPrice = (value: number) =>
   Number(value || 0).toLocaleString('pt-BR', {
@@ -31,11 +32,18 @@ const getInstallments = (price: number) => {
 };
 
 const CnpjLoja = () => {
+  const MODULE_ID = 184;
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { modules } = useApiModules();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [produtos, setProdutos] = useState<CnpjProduto[]>([]);
+
+  const currentModule = useMemo(
+    () => modules.find((module) => Number(module.id) === MODULE_ID) || null,
+    [modules]
+  );
 
   useEffect(() => {
     const load = async () => {
@@ -218,9 +226,11 @@ const CnpjLoja = () => {
   return (
     <div className="space-y-4 sm:space-y-6 px-1 sm:px-0">
       <SimpleTitleBar
-        title="Loja Virtual CNPJ"
-        subtitle="Vitrine da sua empresa com produtos para venda"
-        icon={<Store className="h-4 w-4 sm:h-5 sm:w-5" />}
+        title={currentModule?.title?.toString().trim() || 'Loja Virtual CNPJ'}
+        subtitle={
+          currentModule?.description?.toString().trim() ||
+          'Vitrine da sua empresa com produtos para venda'
+        }
         onBack={() => navigate('/dashboard')}
       />
 
