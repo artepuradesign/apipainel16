@@ -299,6 +299,49 @@ const removeCommaValue = (value: string, target: string) =>
     .filter((item) => item.toLowerCase() !== target.toLowerCase())
     .join(', ');
 
+type StoreHighlightKey = 'nenhum' | 'lancamentos' | 'mais_vendidos' | 'ofertas';
+
+const STORE_HIGHLIGHT_TAGS: Record<Exclude<StoreHighlightKey, 'nenhum'>, string> = {
+  lancamentos: 'Lançamentos',
+  mais_vendidos: 'Mais vendidos',
+  ofertas: 'Ofertas',
+};
+
+const normalizeTextToken = (value: string) =>
+  value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+
+const getStoreHighlightFromTags = (tagsValue: string): StoreHighlightKey => {
+  const tags = normalizeCommaValues(tagsValue).map(normalizeTextToken);
+
+  if (tags.some((tag) => tag === 'lancamentos' || tag === 'lancamento')) return 'lancamentos';
+  if (tags.some((tag) => tag === 'mais vendidos' || tag === 'mais vendido')) return 'mais_vendidos';
+  if (tags.some((tag) => tag === 'ofertas' || tag === 'oferta')) return 'ofertas';
+
+  return 'nenhum';
+};
+
+const applyStoreHighlightTag = (tagsValue: string, highlight: StoreHighlightKey) => {
+  const existingTags = normalizeCommaValues(tagsValue).filter((tag) => {
+    const normalized = normalizeTextToken(tag);
+    return !['lancamentos', 'lancamento', 'mais vendidos', 'mais vendido', 'ofertas', 'oferta'].includes(normalized);
+  });
+
+  if (highlight !== 'nenhum') {
+    existingTags.push(STORE_HIGHLIGHT_TAGS[highlight]);
+  }
+
+  return Array.from(new Set(existingTags)).join(', ');
+};
+
+const getStoreHighlightLabelFromTags = (tagsValue?: string | null) => {
+  const key = getStoreHighlightFromTags((tagsValue || '').toString());
+  return key === 'nenhum' ? null : STORE_HIGHLIGHT_TAGS[key];
+};
+
 const CnpjProdutos = () => {
   const { profile, user } = useAuth();
   const navigate = useNavigate();
@@ -324,6 +367,7 @@ const CnpjProdutos = () => {
   const [saving, setSaving] = useState(false);
   const [catalogVisibility, setCatalogVisibility] = useState<'loja_busca' | 'somente_loja' | 'somente_busca' | 'oculto'>('loja_busca');
   const [tagsProduto, setTagsProduto] = useState('');
+  const [storeHighlight, setStoreHighlight] = useState<StoreHighlightKey>('nenhum');
   const [marcaProduto, setMarcaProduto] = useState('');
   const [externalFeaturedImageUrl, setExternalFeaturedImageUrl] = useState('');
   const [sectionOptions, setSectionOptions] = useState<CnpjProdutoSections>(emptySections);
@@ -508,6 +552,7 @@ const CnpjProdutos = () => {
       fotos: [],
     });
     setTagsProduto('');
+    setStoreHighlight('nenhum');
     setMarcaProduto('');
     setExternalFeaturedImageUrl('');
     setDescricaoProdutoHtml('');
@@ -603,11 +648,13 @@ const CnpjProdutos = () => {
 
     setSaving(true);
     try {
+      const normalizedTags = applyStoreHighlightTag(tagsProduto, storeHighlight);
+
       if (editing) {
         const result = await cnpjProdutosService.atualizar({
           id: editing.id,
           ...parsed.data,
-          tags: tagsProduto,
+          tags: normalizedTags,
           marca: marcaProduto,
           external_featured_image_url: externalFeaturedImageUrl,
         });
@@ -626,7 +673,7 @@ const CnpjProdutos = () => {
           nome_produto: parsed.data.nome_produto,
           sku: parsed.data.sku,
           categoria: parsed.data.categoria,
-          tags: tagsProduto,
+          tags: normalizedTags,
           marca: marcaProduto,
           external_featured_image_url: externalFeaturedImageUrl,
           codigo_barras: parsed.data.codigo_barras,
@@ -682,6 +729,7 @@ const CnpjProdutos = () => {
     setProductPhotos(toPhotoSlots(normalizedPhotos));
     setPendingPhotoFiles(createEmptyFileSlots());
     setTagsProduto((produto.tags || '').toString());
+    setStoreHighlight(getStoreHighlightFromTags((produto.tags || '').toString()));
     setMarcaProduto((produto.marca || '').toString());
     setExternalFeaturedImageUrl((produto.external_featured_image_url || '').toString());
 
@@ -969,6 +1017,20 @@ const CnpjProdutos = () => {
                 </Select>
               </div>
               <div className="space-y-1.5">
+                <Label>Classificação da loja</Label>
+                <Select value={storeHighlight} onValueChange={(value: StoreHighlightKey) => setStoreHighlight(value)}>
+                  <SelectTrigger className="text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="nenhum">Sem destaque</SelectItem>
+                    <SelectItem value="lancamentos">Lançamentos</SelectItem>
+                    <SelectItem value="mais_vendidos">Mais vendidos</SelectItem>
+                    <SelectItem value="ofertas">Ofertas</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
                 <Label>Visibilidade no catálogo</Label>
                 <Select
                   value={catalogVisibility}
@@ -1232,7 +1294,12 @@ const CnpjProdutos = () => {
                       </div>
 
                       <div className="flex items-center justify-between gap-2">
-                        <Badge variant={produto.status === 'ativo' ? 'default' : 'secondary'}>{statusLabel[produto.status]}</Badge>
+                        <div className="flex items-center gap-1.5">
+                          <Badge variant={produto.status === 'ativo' ? 'default' : 'secondary'}>{statusLabel[produto.status]}</Badge>
+                          {getStoreHighlightLabelFromTags(produto.tags) ? (
+                            <Badge variant="outline">{getStoreHighlightLabelFromTags(produto.tags)}</Badge>
+                          ) : null}
+                        </div>
                         <div className="inline-flex items-center gap-1">
                           <Button variant="ghost" size="icon" asChild title="Abrir página de vendas">
                             <a href={`/vendas/produto/${produto.id}`} target="_blank" rel="noreferrer">
@@ -1262,6 +1329,7 @@ const CnpjProdutos = () => {
                       <TableHead>Produto</TableHead>
                       <TableHead>Preço</TableHead>
                       <TableHead>Estoque</TableHead>
+                      <TableHead>Classificação</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead className="text-right">Ações</TableHead>
                     </TableRow>
@@ -1302,6 +1370,7 @@ const CnpjProdutos = () => {
                           </TableCell>
                           <TableCell>R$ {Number(produto.preco).toFixed(2).replace('.', ',')}</TableCell>
                           <TableCell>{produto.controlar_estoque === true || produto.controlar_estoque === 1 ? produto.estoque : '—'}</TableCell>
+                          <TableCell>{getStoreHighlightLabelFromTags(produto.tags) || '—'}</TableCell>
                           <TableCell>
                             <Badge variant={produto.status === 'ativo' ? 'default' : 'secondary'}>{statusLabel[produto.status]}</Badge>
                           </TableCell>

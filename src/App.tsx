@@ -179,6 +179,8 @@ import PdfRg from '@/pages/dashboard/PdfRg';
 import ImprimirRg from '@/pages/dashboard/ImprimirRg';
 import PdfPersonalizado from '@/pages/dashboard/PdfPersonalizado';
 import CnpjProdutos from '@/pages/dashboard/CnpjProdutos';
+import CnpjLoja from '@/pages/dashboard/CnpjLoja';
+import CnpjProduto from '@/pages/dashboard/CnpjProduto';
 import SistemasDominioCom from '@/pages/dashboard/SistemasDominioCom';
 import SistemasDominioComBr from '@/pages/dashboard/SistemasDominioComBr';
 import SistemasHospedagemVps1Mes from '@/pages/dashboard/SistemasHospedagemVps1Mes';
@@ -406,6 +408,8 @@ function App() {
                     <Route path="/dashboard/imprimir-rg" element={<DashboardLayout><ImprimirRg /></DashboardLayout>} />
                     <Route path="/dashboard/pdf-personalizado" element={<DashboardLayout><PdfPersonalizado /></DashboardLayout>} />
                     <Route path="/dashboard/cnpj-produtos" element={<DashboardLayout><CnpjProdutos /></DashboardLayout>} />
+                    <Route path="/dashboard/cnpj-loja" element={<DashboardLayout><CnpjLoja /></DashboardLayout>} />
+                    <Route path="/dashboard/cnpj-produto" element={<DashboardLayout><CnpjProduto /></DashboardLayout>} />
                     <Route path="/dashboard/sistemas-dominio-com" element={<DashboardLayout><SistemasDominioCom /></DashboardLayout>} />
                     <Route path="/dashboard/sistemas-dominio-com-br" element={<DashboardLayout><SistemasDominioComBr /></DashboardLayout>} />
                     <Route path="/dashboard/sistemas-hospedagem-vps-1" element={<DashboardLayout><SistemasHospedagemVps1Mes /></DashboardLayout>} />
