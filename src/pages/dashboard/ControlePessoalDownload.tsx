@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Download, FileArchive, RefreshCw } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import SimpleTitleBar from '@/components/dashboard/SimpleTitleBar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -24,6 +25,7 @@ const formatDate = (isoDate: string) => {
 };
 
 const ControlePessoalDownload = () => {
+  const navigate = useNavigate();
   const [files, setFiles] = useState<ControlePessoalDownloadFile[]>([]);
   const [loading, setLoading] = useState(true);
   const [downloadingFile, setDownloadingFile] = useState<string | null>(null);
@@ -75,6 +77,7 @@ const ControlePessoalDownload = () => {
       <SimpleTitleBar
         title="Controle Pessoal • Downloads"
         subtitle="Baixe os arquivos disponíveis na pasta de download"
+        onBack={() => navigate('/dashboard')}
         icon={<FileArchive className="h-5 w-5" />}
       />
 
