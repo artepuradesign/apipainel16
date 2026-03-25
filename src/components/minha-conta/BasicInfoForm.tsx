@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import { User, CreditCard, Building, Calendar, Phone } from 'lucide-react';
 import { formatCpf, formatCnpj, formatPhone, formatDateOfBirth } from '@/utils/formatters';
 import { useLocale } from '@/contexts/LocaleContext';
@@ -13,6 +15,7 @@ interface UserData {
   tipo_pessoa?: 'fisica' | 'juridica';
   cpf?: string;
   cnpj?: string;
+  avatar_url?: string;
   data_nascimento?: string;
   telefone?: string;
 }
@@ -20,9 +23,11 @@ interface UserData {
 interface BasicInfoFormProps {
   userData: UserData;
   onInputChange: (field: string, value: string) => void;
+  onAvatarUpload: (file: File) => Promise<void>;
+  avatarUploading?: boolean;
 }
 
-const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ userData, onInputChange }) => {
+const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ userData, onInputChange, onAvatarUpload, avatarUploading }) => {
   const { locale } = useLocale();
 
   const t = {
@@ -40,6 +45,10 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ userData, onInputChange }
       birthDate: 'Data de Nascimento',
       birthDateHint: 'Digite ou cole a data (DD/MM/AAAA)',
       phone: 'Telefone',
+      profilePhoto: 'Foto de perfil / logomarca',
+      profilePhotoHint: 'Essa imagem será usada como logomarca da sua empresa nas páginas públicas de vendas.',
+      sendPhoto: 'Enviar foto',
+      sending: 'Enviando...',
     },
     en: {
       title: 'Basic Information',
@@ -55,6 +64,10 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ userData, onInputChange }
       birthDate: 'Birth Date',
       birthDateHint: 'Type or paste date (DD/MM/YYYY)',
       phone: 'Phone',
+      profilePhoto: 'Profile photo / logo',
+      profilePhotoHint: 'This image will be used as your company logo on public sales pages.',
+      sendPhoto: 'Upload photo',
+      sending: 'Uploading...',
     },
     es: {
       title: 'Información Básica',
@@ -70,8 +83,19 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ userData, onInputChange }
       birthDate: 'Fecha de Nacimiento',
       birthDateHint: 'Escribe o pega la fecha (DD/MM/AAAA)',
       phone: 'Teléfono',
+      profilePhoto: 'Foto de perfil / logomarca',
+      profilePhotoHint: 'Esta imagen se usará como logomarca de tu empresa en las páginas públicas de venta.',
+      sendPhoto: 'Subir foto',
+      sending: 'Subiendo...',
     },
   }[locale];
+
+  const initials = (userData.full_name || 'U')
+    .trim()
+    .split(' ')
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join('');
 
   const handleCpfChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatCpf(e.target.value);
@@ -114,6 +138,39 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ userData, onInputChange }
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3 sm:space-y-4 p-4 sm:p-6 pt-0 sm:pt-0">
+        <div className="rounded-lg border border-border bg-muted/30 p-3 sm:p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-3">
+              <Avatar className="h-16 w-16 border border-border">
+                <AvatarImage src={userData.avatar_url} alt="Foto de perfil" />
+                <AvatarFallback>{initials || 'U'}</AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="text-sm font-medium">{t.profilePhoto}</p>
+                <p className="text-xs text-muted-foreground">{t.profilePhotoHint}</p>
+              </div>
+            </div>
+            <Button asChild type="button" variant="outline" size="sm" disabled={avatarUploading}>
+              <Label htmlFor="avatar_upload" className="cursor-pointer">
+                {avatarUploading ? t.sending : t.sendPhoto}
+              </Label>
+            </Button>
+          </div>
+          <Input
+            id="avatar_upload"
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              if (file) {
+                void onAvatarUpload(file);
+              }
+              event.currentTarget.value = '';
+            }}
+          />
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <div className="space-y-1.5 sm:space-y-2">
             <Label htmlFor="full_name" className="text-sm">{t.fullName}</Label>
