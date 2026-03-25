@@ -25,6 +25,7 @@ const CnpjProduto = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [produtos, setProdutos] = useState<CnpjProduto[]>([]);
+  const [selectedImage, setSelectedImage] = useState('');
 
   useEffect(() => {
     const load = async () => {
@@ -62,7 +63,12 @@ const CnpjProduto = () => {
   }, [produtos, selectedId]);
 
   const imagens = useMemo(() => (produtoSelecionado ? normalizeProductPhotos(produtoSelecionado) : []), [produtoSelecionado]);
-  const imagemPrincipal = imagens[0] || '';
+
+  useEffect(() => {
+    setSelectedImage(imagens[0] || '');
+  }, [imagens]);
+
+  const imagemPrincipal = selectedImage || imagens[0] || '';
 
   return (
     <div className="space-y-4 sm:space-y-6 px-1 sm:px-0">
@@ -109,11 +115,7 @@ const CnpjProduto = () => {
                     <button
                       key={image}
                       type="button"
-                      onClick={() => {
-                        const params = new URLSearchParams(searchParams);
-                        params.set('id', String(produtoSelecionado.id));
-                        setSearchParams(params);
-                      }}
+                      onClick={() => setSelectedImage(image)}
                       className="overflow-hidden rounded-md border"
                     >
                       <img src={image} alt={`Miniatura de ${produtoSelecionado.nome_produto}`} className="h-16 w-full object-cover" loading="lazy" />
