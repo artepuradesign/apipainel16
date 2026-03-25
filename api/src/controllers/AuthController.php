@@ -5,6 +5,7 @@
 require_once __DIR__ . '/../services/LoginService.php';
 require_once __DIR__ . '/../services/AuthService.php';
 require_once __DIR__ . '/../utils/Response.php';
+require_once __DIR__ . '/../utils/FileUpload.php';
 
 class AuthController {
     private $loginService;
@@ -348,6 +349,95 @@ class AuthController {
             Response::error('Erro interno do servidor', 500);
         }
     }
+
+    public function uploadAvatar() {
+        try {
+            $headers = getallheaders();
+            $token = null;
+
+            if (isset($headers['Authorization'])) {
+                $authHeader = $headers['Authorization'];
+                if (preg_match('/Bearer\s+(.*)$/i', $authHeader, $matches)) {
+                    $token = $matches[1];
+                }
+            }
+
+            if (!$token) {
+                Response::error('Token não fornecido', 401);
+                return;
+            }
+
+            $tokenValidation = $this->authService->validateToken($token);
+            if (!$tokenValidation['success']) {
+                Response::error('Token inválido ou expirado', 401);
+                return;
+            }
+
+            $userId = (int)($tokenValidation['data']['user']['id'] ?? 0);
+            if ($userId <= 0) {
+                Response::error('Usuário inválido', 401);
+                return;
+            }
+
+            $file = null;
+            if (isset($_FILES['photo']) && is_array($_FILES['photo'])) {
+                $file = $_FILES['photo'];
+            } elseif (isset($_FILES['file']) && is_array($_FILES['file'])) {
+                $file = $_FILES['file'];
+            }
+
+            if (!$file) {
+                Response::error('Arquivo de imagem é obrigatório', 400);
+                return;
+            }
+
+            if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+                Response::error('Erro ao enviar arquivo', 400);
+                return;
+            }
+
+            $allowedMime = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+            if (!in_array((string)($file['type'] ?? ''), $allowedMime, true)) {
+                Response::error('Formato inválido. Use JPEG, PNG, GIF ou WebP', 400);
+                return;
+            }
+
+            $maxSize = 5 * 1024 * 1024;
+            if ((int)($file['size'] ?? 0) > $maxSize) {
+                Response::error('Arquivo muito grande. Máximo permitido: 5MB', 400);
+                return;
+            }
+
+            $extension = strtolower((string)pathinfo((string)($file['name'] ?? ''), PATHINFO_EXTENSION));
+            if (!in_array($extension, ['jpg', 'jpeg', 'png', 'webp', 'gif'], true)) {
+                $extension = 'jpg';
+            }
+
+            $uploadDir = FileUpload::getUploadDir();
+            $fileName = 'avatar_' . $userId . '_' . date('YmdHis') . '_' . bin2hex(random_bytes(4)) . '.' . $extension;
+            $targetPath = $uploadDir . $fileName;
+
+            if (!move_uploaded_file((string)$file['tmp_name'], $targetPath)) {
+                Response::error('Falha ao salvar arquivo no servidor', 500);
+                return;
+            }
+
+            Response::success([
+                'filename' => $fileName,
+                'url' => $this->buildUploadFileUrl($fileName),
+            ], 'Foto de perfil enviada com sucesso');
+        } catch (Exception $e) {
+            error_log("AUTHCONTROLLER UPLOAD_AVATAR EXCEPTION: " . $e->getMessage());
+            Response::error('Erro ao enviar foto de perfil', 500);
+        }
+    }
+
+    private function buildUploadFileUrl(string $filename): string {
+        $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+        $host = $_SERVER['HTTP_HOST'] ?? 'api.apipainel.com.br';
+        return $scheme . '://' . $host . '/produtos/' . rawurlencode(basename($filename));
+    }
+
     public function changePassword() {
         try {
             error_log("AUTHCONTROLLER: === PROCESSANDO ALTERAÇÃO DE SENHA ===");

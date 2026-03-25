@@ -44,9 +44,10 @@ class CnpjProdutos extends BaseModel {
         }
 
         $whereSql = 'WHERE ' . implode(' AND ', $where);
-        $query = "SELECT p.*, u.full_name AS owner_name, u.cnpj AS owner_cnpj
+        $query = "SELECT p.*, u.full_name AS owner_name, u.cnpj AS owner_cnpj, up.avatar_url AS owner_avatar_url
                   FROM {$this->table} p
                   LEFT JOIN users u ON u.id = p.user_id
+                  LEFT JOIN user_profiles up ON up.user_id = u.id
                   {$whereSql}
                   ORDER BY p.id DESC
                   LIMIT ? OFFSET ?";
@@ -101,9 +102,10 @@ class CnpjProdutos extends BaseModel {
     }
 
     public function findByIdForUser(int $id, int $userId, bool $isAdmin): ?array {
-        $query = "SELECT p.*, u.full_name AS owner_name, u.cnpj AS owner_cnpj
+        $query = "SELECT p.*, u.full_name AS owner_name, u.cnpj AS owner_cnpj, up.avatar_url AS owner_avatar_url
                   FROM {$this->table} p
                   LEFT JOIN users u ON u.id = p.user_id
+                  LEFT JOIN user_profiles up ON up.user_id = u.id
                   WHERE p.id = ? AND p.ativo = 1";
         $params = [$id];
 
@@ -122,9 +124,10 @@ class CnpjProdutos extends BaseModel {
     }
 
     public function findPublicById(int $id): ?array {
-        $query = "SELECT p.*, u.full_name AS owner_name, u.cnpj AS owner_cnpj
+        $query = "SELECT p.*, u.full_name AS owner_name, u.cnpj AS owner_cnpj, up.avatar_url AS owner_avatar_url
                   FROM {$this->table} p
                   LEFT JOIN users u ON u.id = p.user_id
+                  LEFT JOIN user_profiles up ON up.user_id = u.id
                   WHERE p.id = ?
                     AND p.ativo = 1
                     AND p.status = 'ativo'
@@ -143,9 +146,10 @@ class CnpjProdutos extends BaseModel {
             return null;
         }
 
-        $query = "SELECT p.*, u.full_name AS owner_name, u.cnpj AS owner_cnpj
+        $query = "SELECT p.*, u.full_name AS owner_name, u.cnpj AS owner_cnpj, up.avatar_url AS owner_avatar_url
                   FROM {$this->table} p
                   LEFT JOIN users u ON u.id = p.user_id
+                  LEFT JOIN user_profiles up ON up.user_id = u.id
                   WHERE p.ativo = 1
                     AND REPLACE(REPLACE(REPLACE(REPLACE(COALESCE(p.codigo_barras, ''), ' ', ''), '.', ''), '-', ''), '/', '') = ?";
         $params = [$normalizedBarcode];
@@ -222,6 +226,36 @@ class CnpjProdutos extends BaseModel {
         $stmt->execute($values);
 
         return (int)$this->db->lastInsertId();
+    }
+
+    public function listPublicByCnpj(string $cnpjDigits, int $limit = 120): array {
+        $query = "SELECT p.*, u.full_name AS owner_name, u.cnpj AS owner_cnpj, up.avatar_url AS owner_avatar_url
+                  FROM {$this->table} p
+                  LEFT JOIN users u ON u.id = p.user_id
+                  LEFT JOIN user_profiles up ON up.user_id = u.id
+                  WHERE p.ativo = 1
+                    AND p.status = 'ativo'
+                    AND REPLACE(REPLACE(REPLACE(p.cnpj, '.', ''), '/', ''), '-', '') = ?
+                  ORDER BY p.created_at DESC, p.id DESC
+                  LIMIT ?";
+
+        $stmt = $this->db->prepare($query);
+        $stmt->execute([$cnpjDigits, max(1, min(200, $limit))]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function findPublicStoreMetaByCnpj(string $cnpjDigits): ?array {
+        $query = "SELECT u.full_name AS nome_empresa, u.cnpj, up.avatar_url AS owner_avatar_url
+                  FROM users u
+                  LEFT JOIN user_profiles up ON up.user_id = u.id
+                  WHERE REPLACE(REPLACE(REPLACE(u.cnpj, '.', ''), '/', ''), '-', '') = ?
+                  LIMIT 1";
+
+        $stmt = $this->db->prepare($query);
+        $stmt->execute([$cnpjDigits]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row ?: null;
     }
 
     public function updateProduto(int $id, array $fields): bool {

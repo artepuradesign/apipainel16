@@ -111,7 +111,7 @@ class AuthService {
     private function getUserWithActiveSubscription($userId) {
         try {
             // Buscar dados básicos do usuário
-            $userQuery = "SELECT * FROM users WHERE id = ?";
+            $userQuery = "SELECT u.*, up.avatar_url FROM users u LEFT JOIN user_profiles up ON up.user_id = u.id WHERE u.id = ?";
             $userStmt = $this->db->prepare($userQuery);
             $userStmt->execute([$userId]);
             $user = $userStmt->fetch(PDO::FETCH_ASSOC);
@@ -568,7 +568,8 @@ class AuthService {
                 }
             }
             
-            if (empty($updateFields)) {
+            $hasAvatarUpdate = array_key_exists('avatar_url', $data);
+            if (empty($updateFields) && !$hasAvatarUpdate) {
                 return [
                     'success' => false,
                     'message' => 'Nenhum campo válido fornecido para atualização',
@@ -578,19 +579,42 @@ class AuthService {
             
             $this->db->beginTransaction();
             
-            // Atualizar na tabela users
-            $params[] = $userId;
-            $query = "UPDATE users SET " . implode(', ', $updateFields) . ", updated_at = NOW() WHERE id = ?";
-            $stmt = $this->db->prepare($query);
-            
-            if (!$stmt->execute($params)) {
-                $this->db->rollback();
-                error_log("AUTH_SERVICE: Erro ao executar UPDATE query");
-                return [
-                    'success' => false,
-                    'message' => 'Erro ao atualizar perfil no banco de dados',
-                    'status_code' => 500
-                ];
+            if (!empty($updateFields)) {
+                // Atualizar na tabela users
+                $params[] = $userId;
+                $query = "UPDATE users SET " . implode(', ', $updateFields) . ", updated_at = NOW() WHERE id = ?";
+                $stmt = $this->db->prepare($query);
+
+                if (!$stmt->execute($params)) {
+                    $this->db->rollback();
+                    error_log("AUTH_SERVICE: Erro ao executar UPDATE query");
+                    return [
+                        'success' => false,
+                        'message' => 'Erro ao atualizar perfil no banco de dados',
+                        'status_code' => 500
+                    ];
+                }
+            }
+
+            if ($hasAvatarUpdate) {
+                $avatarUrl = trim((string)$data['avatar_url']);
+                if ($avatarUrl === '') {
+                    $avatarUrl = null;
+                }
+
+                $profileUpsert = "INSERT INTO user_profiles (user_id, avatar_url, timezone, language, theme, created_at, updated_at)
+                                  VALUES (?, ?, 'America/Sao_Paulo', 'pt-BR', 'light', NOW(), NOW())
+                                  ON DUPLICATE KEY UPDATE avatar_url = VALUES(avatar_url), updated_at = NOW()";
+                $profileStmt = $this->db->prepare($profileUpsert);
+                if (!$profileStmt->execute([$userId, $avatarUrl])) {
+                    $this->db->rollback();
+                    error_log("AUTH_SERVICE: Erro ao salvar avatar_url em user_profiles");
+                    return [
+                        'success' => false,
+                        'message' => 'Erro ao atualizar foto de perfil',
+                        'status_code' => 500
+                    ];
+                }
             }
             
             $this->db->commit();
@@ -598,7 +622,7 @@ class AuthService {
             error_log("AUTH_SERVICE: Perfil atualizado com sucesso para usuário: " . $userId);
             
             // Buscar dados atualizados
-            $updatedUserQuery = "SELECT * FROM users WHERE id = ?";
+            $updatedUserQuery = "SELECT u.*, up.avatar_url FROM users u LEFT JOIN user_profiles up ON up.user_id = u.id WHERE u.id = ?";
             $updatedStmt = $this->db->prepare($updatedUserQuery);
             $updatedStmt->execute([$userId]);
             $updatedUser = $updatedStmt->fetch(PDO::FETCH_ASSOC);

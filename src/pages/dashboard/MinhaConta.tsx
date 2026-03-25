@@ -27,8 +27,10 @@ const MinhaConta = () => {
     userData,
     loading,
     saving,
+    avatarUploading,
     handleInputChange,
-    handleSave
+    handleSave,
+    handleAvatarUpload,
   } = useMinhaContaData();
 
   const i18n = {
@@ -136,6 +138,8 @@ const MinhaConta = () => {
       <BasicInfoForm
         userData={userData}
         onInputChange={handleInputChange}
+        onAvatarUpload={handleAvatarUpload}
+        avatarUploading={avatarUploading}
       />
 
       {premiumUnlocked && <PremiumPanelsSection onToggle={handlePremiumToggleActivation} />}

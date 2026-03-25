@@ -72,7 +72,8 @@ const mapApiUserToAuthUser = (apiUser: ApiUser): AuthUser => {
     updated_at: apiUser.updated_at,
     data_inicio: apiUser.data_inicio,
     data_fim: apiUser.data_fim,
-    premium_enabled: apiUser.premium_enabled
+    premium_enabled: apiUser.premium_enabled,
+    avatar_url: apiUser.avatar_url ?? null,
   };
 };
 
@@ -90,7 +91,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const profileObj: Profile = {
       id: userObj.id,
       full_name: userObj.full_name,
-      avatar_url: null,
+      avatar_url: userObj.avatar_url ?? null,
       user_role: userObj.user_role
     };
     
@@ -151,7 +152,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const profileObj: Profile = {
             id: userObj.id,
             full_name: userObj.full_name,
-            avatar_url: null,
+            avatar_url: userObj.avatar_url ?? null,
             user_role: userObj.user_role
           };
           

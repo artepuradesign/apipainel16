@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { authApiService } from '@/services/authApiService';
+import { apiRequest, fetchApiConfig } from '@/config/api';
 import { cookieUtils } from '@/utils/cookieUtils';
 import { toast } from 'sonner';
 
@@ -26,6 +27,7 @@ interface UserData {
   saldo: number;
   saldo_plano: number;
   tipoplano: string;
+  avatar_url?: string;
   codigo_indicacao?: string;
   aceite_termos: boolean;
   email_verificado: boolean;
@@ -45,6 +47,7 @@ export const useMinhaContaData = () => {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [avatarUploading, setAvatarUploading] = useState(false);
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -78,6 +81,7 @@ export const useMinhaContaData = () => {
             saldo: user.saldo || 0,
             saldo_plano: user.saldo_plano || 0,
             tipoplano: user.tipoplano || 'Pré-Pago',
+             avatar_url: (user as any).avatar_url,
             codigo_indicacao: user.codigo_indicacao,
             aceite_termos: user.aceite_termos || false,
             email_verificado: user.email_verificado || false,
@@ -128,6 +132,7 @@ export const useMinhaContaData = () => {
                   saldo: apiUser.saldo || 0,
                   saldo_plano: apiUser.saldo_plano || 0,
                   tipoplano: apiUser.tipoplano || 'Pré-Pago',
+                   avatar_url: (apiUser as any).avatar_url,
                   codigo_indicacao: apiUser.codigo_indicacao,
                   aceite_termos: apiUser.aceite_termos || false,
                   email_verificado: apiUser.email_verificado || false,
@@ -176,6 +181,49 @@ export const useMinhaContaData = () => {
     }));
   };
 
+  const handleAvatarUpload = async (file: File) => {
+    try {
+      setAvatarUploading(true);
+      await fetchApiConfig();
+      const sessionToken = cookieUtils.get('session_token') || cookieUtils.get('api_session_token');
+
+      if (!sessionToken || sessionToken === 'authenticated') {
+        toast.error('Sessão expirada. Faça login novamente.');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('photo', file);
+
+      const uploadResult = await apiRequest<any>('/auth/upload-avatar', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${sessionToken}`,
+        },
+        body: formData,
+      });
+
+      if (!uploadResult?.success || !uploadResult?.data?.url) {
+        throw new Error(uploadResult?.error || 'Não foi possível enviar a foto de perfil');
+      }
+
+      setUserData((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          avatar_url: uploadResult.data.url,
+        };
+      });
+
+      toast.success('Foto enviada com sucesso! Agora clique em salvar.');
+    } catch (error) {
+      console.error('❌ [MINHA_CONTA] Erro ao enviar avatar:', error);
+      toast.error(error instanceof Error ? error.message : 'Erro ao enviar foto de perfil');
+    } finally {
+      setAvatarUploading(false);
+    }
+  };
+
 
   const handleSave = async () => {
     if (!userData) return;
@@ -200,7 +248,8 @@ export const useMinhaContaData = () => {
         cnpj: userData.cnpj,
         data_nascimento: userData.data_nascimento,
         telefone: userData.telefone,
-        tipo_pessoa: userData.tipo_pessoa
+        tipo_pessoa: userData.tipo_pessoa,
+        avatar_url: userData.avatar_url || null,
       };
       
       console.log('🔍 [DEBUG] Request data:', requestData);
@@ -263,7 +312,9 @@ export const useMinhaContaData = () => {
     userData,
     loading,
     saving,
+    avatarUploading,
     handleInputChange,
-    handleSave
+    handleSave,
+    handleAvatarUpload,
   };
 };

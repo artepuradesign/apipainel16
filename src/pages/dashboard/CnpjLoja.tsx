@@ -65,6 +65,16 @@ const CnpjLoja = () => {
 
   const sections = useMemo(() => splitStoreSections(produtos), [produtos]);
 
+  const handleOpenOnlineStore = () => {
+    const cnpjDigits = (user?.cnpj || '').replace(/\D+/g, '');
+    if (cnpjDigits.length !== 14) {
+      toast.error('Preencha um CNPJ válido em Dados Pessoais para abrir sua loja online.');
+      return;
+    }
+
+    window.open(`/vendas/loja/${cnpjDigits}`, '_blank', 'noopener,noreferrer');
+  };
+
   const handleDeleteFromCard = async (produto: CnpjProduto) => {
     const confirmed = window.confirm(`Deseja excluir o produto \"${produto.nome_produto}\"?`);
     if (!confirmed) return;
@@ -223,9 +233,9 @@ const CnpjLoja = () => {
           </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => navigate('/dashboard/cnpj-produtos')}>Gerenciar produtos</Button>
-            <Button onClick={() => navigate('/dashboard/cnpj-produto')}>
+            <Button onClick={handleOpenOnlineStore}>
               <ShoppingBag className="h-4 w-4" />
-              Visualizar produto
+              Loja Online
             </Button>
           </div>
         </CardContent>

@@ -29,8 +29,20 @@ export interface CnpjProduto {
   ativo: number;
   owner_name?: string | null;
   owner_cnpj?: string | null;
+  owner_avatar_url?: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface PublicStoreCompany {
+  nome_empresa?: string | null;
+  cnpj: string;
+  avatar_url?: string | null;
+}
+
+export interface PublicStoreResponse {
+  empresa: PublicStoreCompany;
+  produtos: CnpjProduto[];
 }
 
 export interface ApiResponse<T = any> {
@@ -204,5 +216,10 @@ export const cnpjProdutosService = {
 
   async detalhePublico(id: number) {
     return apiRequest<CnpjProduto>(`/cnpj-produtos/detalhe-publico?id=${id}`, { method: 'GET' }, false);
+  },
+
+  async lojaPublica(cnpj: string) {
+    const cnpjDigits = cnpj.replace(/\D+/g, '');
+    return apiRequest<PublicStoreResponse>(`/cnpj-produtos/loja-publica?cnpj=${encodeURIComponent(cnpjDigits)}`, { method: 'GET' }, false);
   },
 };
