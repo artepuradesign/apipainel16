@@ -39,6 +39,8 @@ try {
         $authController->validateToken();
     } elseif ($method === 'POST' && $path === '/auth/update-profile') {
         $authController->updateProfile();
+    } elseif ($method === 'POST' && $path === '/auth/upload-avatar') {
+        $authController->uploadAvatar();
     } elseif ($method === 'POST' && $path === '/auth/change-password') {
         $authController->changePassword();
     } elseif ($method === 'POST' && $path === '/auth/forgot-password') {
