@@ -584,6 +584,18 @@ class CnpjProdutosController {
         $row['categoria'] = !empty($row['categoria']) ? (string)$row['categoria'] : null;
         $row['tags'] = !empty($row['tags']) ? (string)$row['tags'] : null;
         $row['marca'] = !empty($row['marca']) ? (string)$row['marca'] : null;
+        $row['owner_name'] = !empty($row['owner_name']) ? mb_substr(trim((string)$row['owner_name']), 0, 255) : null;
+        $ownerCnpjDigits = preg_replace('/\D+/', '', (string)($row['owner_cnpj'] ?? ''));
+        $row['owner_cnpj'] = strlen($ownerCnpjDigits) === 14 ? $this->formatCnpj($ownerCnpjDigits) : null;
+
+        if (!empty($row['owner_name'])) {
+            $row['nome_empresa'] = $row['owner_name'];
+        }
+
+        if (!empty($row['owner_cnpj'])) {
+            $row['cnpj'] = $row['owner_cnpj'];
+        }
+
         $row['external_featured_image_url'] = !empty($row['external_featured_image_url']) ? (string)$row['external_featured_image_url'] : null;
         $row['controlar_estoque'] = ((int)($row['controlar_estoque'] ?? 0)) === 1;
 

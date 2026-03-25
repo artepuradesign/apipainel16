@@ -26,6 +26,7 @@ export interface CnpjProduto {
   status: ProdutoStatus;
   ativo: number;
   owner_name?: string | null;
+  owner_cnpj?: string | null;
   created_at: string;
   updated_at: string;
 }

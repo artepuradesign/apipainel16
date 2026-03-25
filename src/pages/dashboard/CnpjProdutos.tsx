@@ -1212,6 +1212,7 @@ const CnpjProdutos = () => {
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-semibold truncate">{produto.nome_produto}</p>
                           <p className="text-xs text-muted-foreground truncate">{produto.nome_empresa}</p>
+                          <p className="text-xs text-muted-foreground truncate">{produto.cnpj}</p>
                           <p className="text-xs text-muted-foreground truncate">{produto.sku || 'Sem SKU'}</p>
                         </div>
                       </div>
