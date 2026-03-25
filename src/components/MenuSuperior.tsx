@@ -139,11 +139,11 @@ const MenuSuperior = () => {
                   {user && (
                     <Link to="/dashboard" className="ml-2">
                       <Button
-                        variant="ghost"
+                        variant="outline"
                         size="sm"
-                        className="h-10 rounded-xl bg-gradient-to-r from-primary to-primary/80 px-4 text-primary-foreground hover:from-primary/90 hover:to-primary/70"
+                        className="h-8 rounded-lg px-3 text-xs font-medium bg-background text-foreground border-border hover:bg-muted"
                       >
-                        <PanelLeft className="mr-2 h-4 w-4" />
+                        <PanelLeft className="mr-1.5 h-3.5 w-3.5" />
                         {content.sidebarOnlinePanels}
                       </Button>
                     </Link>
