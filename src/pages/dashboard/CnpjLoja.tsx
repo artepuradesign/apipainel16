@@ -75,7 +75,7 @@ const CnpjLoja = () => {
             Gerenciar
           </Button>
         </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 xl:grid-cols-3 2xl:grid-cols-4">
           {items.map((produto) => {
             const image = normalizeProductPhotos(produto)[0] || '';
             const highlight = getHighlightFromTags(produto.tags);
@@ -197,7 +197,7 @@ const CnpjLoja = () => {
       </Card>
 
       {loading ? (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
           {Array.from({ length: 4 }).map((_, index) => (
             <Skeleton key={index} className="h-[280px] w-full rounded-lg" />
           ))}
