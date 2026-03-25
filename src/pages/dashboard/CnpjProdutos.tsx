@@ -698,6 +698,13 @@ const CnpjProdutos = () => {
   };
 
   const handleEdit = (produto: CnpjProduto) => {
+    if (showManagementSection) {
+      navigate('/dashboard/cnpj-produtos', {
+        state: { editingProduct: produto },
+      });
+      return;
+    }
+
     const normalizedPhotos = normalizeProductPhotos(produto.fotos, produto.fotos_json);
     const existingDescription =
       ((produto as CnpjProduto & { descricao_produto?: string; descricao?: string }).descricao_produto ||
@@ -729,6 +736,17 @@ const CnpjProdutos = () => {
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  useEffect(() => {
+    if (showManagementSection) return;
+
+    const state = location.state as { editingProduct?: CnpjProduto } | null;
+    const editingProduct = state?.editingProduct;
+    if (!editingProduct) return;
+
+    handleEdit(editingProduct);
+    navigate('/dashboard/cnpj-produtos', { replace: true, state: null });
+  }, [location.state, navigate, showManagementSection]);
 
   const selectedPhotosCount = useMemo(
     () =>
