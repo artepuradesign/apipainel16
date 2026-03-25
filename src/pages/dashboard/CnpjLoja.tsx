@@ -75,7 +75,7 @@ const CnpjLoja = () => {
             Gerenciar
           </Button>
         </div>
-        <div className="grid grid-cols-2 gap-4 xl:grid-cols-3 2xl:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4 xl:grid-cols-4">
           {items.map((produto) => {
             const image = normalizeProductPhotos(produto)[0] || '';
             const highlight = getHighlightFromTags(produto.tags);
@@ -85,8 +85,8 @@ const CnpjLoja = () => {
             const installmentValue = produto.preco / installments;
 
             return (
-              <Card key={produto.id} className="h-full overflow-hidden rounded-xl border-border/70 transition-all hover:-translate-y-0.5 hover:shadow-md hover:shadow-primary/10">
-                <CardContent className="space-y-3 p-0">
+              <Card key={produto.id} className="h-full overflow-hidden rounded-2xl border-border/60 bg-card transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/10">
+                <CardContent className="p-0">
                   <button
                     type="button"
                     onClick={() => navigate(`/dashboard/cnpj-produto?id=${produto.id}`)}
@@ -98,10 +98,10 @@ const CnpjLoja = () => {
                           src={image}
                           alt={`Imagem do produto ${produto.nome_produto}`}
                           loading="lazy"
-                          className="h-52 w-full border-b border-border/60 object-cover transition-transform duration-300 group-hover:scale-[1.02] md:h-56"
+                           className="h-40 w-full border-b border-border/60 object-cover transition-transform duration-300 group-hover:scale-[1.02] sm:h-44"
                         />
                       ) : (
-                        <div className="flex h-52 w-full items-center justify-center border-b border-border/60 bg-muted/40 text-xs text-muted-foreground md:h-56">
+                         <div className="flex h-40 w-full items-center justify-center border-b border-border/60 bg-muted/40 text-xs text-muted-foreground sm:h-44">
                           Sem imagem
                         </div>
                       )}
@@ -111,7 +111,7 @@ const CnpjLoja = () => {
                           type="button"
                           size="icon"
                           variant="secondary"
-                          className="h-9 w-9 rounded-full shadow-sm"
+                          className="h-8 w-8 rounded-full shadow-sm"
                           onClick={(event) => {
                             event.stopPropagation();
                           }}
@@ -129,20 +129,20 @@ const CnpjLoja = () => {
                     </div>
                   </button>
 
-                  <div className="flex min-h-[210px] flex-col gap-3 p-4">
-                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                      <Badge variant="secondary" className="w-fit max-w-full truncate">
+                  <div className="flex h-full flex-col gap-2.5 p-3 sm:p-4">
+                    <div className="flex items-start justify-between gap-2">
+                      <Badge variant="secondary" className="w-fit max-w-[62%] truncate text-[10px]">
                         {produto.categoria || 'Sem categoria'}
                       </Badge>
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
                         {Array.from({ length: 5 }).map((_, idx) => (
-                          <Star key={idx} className="h-3 w-3" />
+                          <Star key={idx} className="h-2.5 w-2.5" />
                         ))}
                         <span>0.0 (0)</span>
                       </div>
                     </div>
 
-                    <h3 className="line-clamp-2 min-h-[2.75rem] text-sm font-semibold leading-snug md:text-base">{produto.nome_produto}</h3>
+                    <h3 className="line-clamp-2 min-h-[2.5rem] text-sm font-semibold leading-tight">{produto.nome_produto}</h3>
 
                     {discountPercent > 0 ? (
                       <div className="flex items-center gap-2">
@@ -151,13 +151,13 @@ const CnpjLoja = () => {
                       </div>
                     ) : null}
 
-                    <p className="text-xl font-bold text-foreground">{formatPrice(pixPrice)} no Pix</p>
+                    <p className="text-base font-bold text-foreground sm:text-lg">{formatPrice(pixPrice)} no Pix</p>
 
-                    <p className="min-h-[2rem] text-xs text-muted-foreground">
+                    <p className="line-clamp-2 min-h-[2rem] text-[11px] leading-relaxed text-muted-foreground">
                       em {installments}x de {formatPrice(installmentValue)} sem juros no cartão de crédito
                     </p>
 
-                    <Button className="mt-auto w-full" onClick={() => navigate(`/dashboard/cnpj-produto?id=${produto.id}`)}>
+                    <Button size="sm" className="mt-auto w-full" onClick={() => navigate(`/dashboard/cnpj-produto?id=${produto.id}`)}>
                       Ver produto
                     </Button>
                   </div>
@@ -197,7 +197,7 @@ const CnpjLoja = () => {
       </Card>
 
       {loading ? (
-        <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4 xl:grid-cols-4">
           {Array.from({ length: 4 }).map((_, index) => (
             <Skeleton key={index} className="h-[280px] w-full rounded-lg" />
           ))}
