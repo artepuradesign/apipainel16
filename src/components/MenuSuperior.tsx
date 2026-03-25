@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Menu, X, LogOut, Package, ChevronRight, LogIn, UserPlus, LayoutGrid, Gift, Languages } from 'lucide-react';
+import { Menu, X, LogOut, Package, ChevronRight, LogIn, UserPlus, LayoutGrid, Gift, Languages, PanelLeft } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { toast } from "sonner";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -135,6 +135,19 @@ const MenuSuperior = () => {
                       <p>{content.openLanguage}</p>
                     </TooltipContent>
                   </Tooltip>
+
+                  {user && (
+                    <Link to="/dashboard" className="ml-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-10 rounded-xl bg-gradient-to-r from-primary to-primary/80 px-4 text-primary-foreground hover:from-primary/90 hover:to-primary/70"
+                      >
+                        <PanelLeft className="mr-2 h-4 w-4" />
+                        {content.sidebarOnlinePanels}
+                      </Button>
+                    </Link>
+                  )}
                 </div>
               </div>
             </div>
