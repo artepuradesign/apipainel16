@@ -19,6 +19,11 @@ if ($method === 'GET' && strpos($path, '/cnpj-produtos/detalhe-publico') !== fal
     exit;
 }
 
+if ($method === 'GET' && strpos($path, '/cnpj-produtos/loja-publica') !== false) {
+    $controller->lojaPublica();
+    exit;
+}
+
 $authMiddleware = new AuthMiddleware($db);
 if (!$authMiddleware->handle()) {
     exit;
