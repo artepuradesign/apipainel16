@@ -75,7 +75,7 @@ const CnpjLoja = () => {
             Gerenciar
           </Button>
         </div>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           {items.map((produto) => {
             const image = normalizeProductPhotos(produto)[0] || '';
             const highlight = getHighlightFromTags(produto.tags);
@@ -85,7 +85,7 @@ const CnpjLoja = () => {
             const installmentValue = produto.preco / installments;
 
             return (
-              <Card key={produto.id} className="overflow-hidden rounded-xl border-border/70 transition-all hover:shadow-md hover:shadow-primary/10">
+              <Card key={produto.id} className="h-full overflow-hidden rounded-xl border-border/70 transition-all hover:-translate-y-0.5 hover:shadow-md hover:shadow-primary/10">
                 <CardContent className="space-y-3 p-0">
                   <button
                     type="button"
@@ -98,10 +98,10 @@ const CnpjLoja = () => {
                           src={image}
                           alt={`Imagem do produto ${produto.nome_produto}`}
                           loading="lazy"
-                          className="h-48 w-full border-b border-border/60 object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                          className="h-52 w-full border-b border-border/60 object-cover transition-transform duration-300 group-hover:scale-[1.02] md:h-56"
                         />
                       ) : (
-                        <div className="flex h-48 w-full items-center justify-center border-b border-border/60 bg-muted/40 text-xs text-muted-foreground">
+                        <div className="flex h-52 w-full items-center justify-center border-b border-border/60 bg-muted/40 text-xs text-muted-foreground md:h-56">
                           Sem imagem
                         </div>
                       )}
@@ -129,9 +129,9 @@ const CnpjLoja = () => {
                     </div>
                   </button>
 
-                  <div className="space-y-2 p-3">
-                    <div className="flex items-center justify-between gap-2">
-                      <Badge variant="secondary" className="max-w-[70%] truncate">
+                  <div className="flex min-h-[210px] flex-col gap-3 p-4">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                      <Badge variant="secondary" className="w-fit max-w-full truncate">
                         {produto.categoria || 'Sem categoria'}
                       </Badge>
                       <div className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -142,7 +142,7 @@ const CnpjLoja = () => {
                       </div>
                     </div>
 
-                    <h3 className="line-clamp-2 min-h-[2.5rem] text-sm font-semibold leading-snug">{produto.nome_produto}</h3>
+                    <h3 className="line-clamp-2 min-h-[2.75rem] text-sm font-semibold leading-snug md:text-base">{produto.nome_produto}</h3>
 
                     {discountPercent > 0 ? (
                       <div className="flex items-center gap-2">
@@ -151,13 +151,13 @@ const CnpjLoja = () => {
                       </div>
                     ) : null}
 
-                    <p className="text-lg font-bold text-foreground">{formatPrice(pixPrice)} no Pix</p>
+                    <p className="text-xl font-bold text-foreground">{formatPrice(pixPrice)} no Pix</p>
 
-                    <p className="text-xs text-muted-foreground">
+                    <p className="min-h-[2rem] text-xs text-muted-foreground">
                       em {installments}x de {formatPrice(installmentValue)} sem juros no cartão de crédito
                     </p>
 
-                    <Button className="w-full" onClick={() => navigate(`/dashboard/cnpj-produto?id=${produto.id}`)}>
+                    <Button className="mt-auto w-full" onClick={() => navigate(`/dashboard/cnpj-produto?id=${produto.id}`)}>
                       Ver produto
                     </Button>
                   </div>
