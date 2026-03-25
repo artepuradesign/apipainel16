@@ -9,14 +9,20 @@ require_once __DIR__ . '/../controllers/CnpjProdutosController.php';
 $corsMiddleware = new CorsMiddleware();
 $corsMiddleware->handle();
 
+$method = $_SERVER['REQUEST_METHOD'];
+$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
+$controller = new CnpjProdutosController($db);
+
+if ($method === 'GET' && strpos($path, '/cnpj-produtos/detalhe-publico') !== false) {
+    $controller->detalhePublico();
+    exit;
+}
+
 $authMiddleware = new AuthMiddleware($db);
 if (!$authMiddleware->handle()) {
     exit;
 }
-
-$controller = new CnpjProdutosController($db);
-$method = $_SERVER['REQUEST_METHOD'];
-$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 switch ($method) {
     case 'GET':

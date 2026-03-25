@@ -15,7 +15,7 @@ export const useAuthGuard = () => {
 
       // Rotas públicas que não precisam de autenticação
       const publicRoutes = ['/', '/login', '/registration', '/forgot-password', '/auth-loading', '/planos-publicos', '/indicacoes', '/privacy', '/terms', '/cookies', '/about', '/api-docs', '/verify-email', '/qrcode', '/temp'];
-      const publicRoutePrefixes = ['/temp/', '/qrcode/'];
+      const publicRoutePrefixes = ['/temp/', '/qrcode/', '/vendas/produto/'];
       const isPublicRoute =
         publicRoutes.includes(location.pathname) ||
         publicRoutePrefixes.some((prefix) => location.pathname.startsWith(prefix));

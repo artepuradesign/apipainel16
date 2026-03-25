@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { z } from 'zod';
-import { Package, Plus, RefreshCw, Pencil, Trash2, Search, ScanLine } from 'lucide-react';
+import { Package, Plus, RefreshCw, Pencil, Trash2, Search, ScanLine, ExternalLink } from 'lucide-react';
 import DashboardTitleCard from '@/components/dashboard/DashboardTitleCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -300,7 +300,7 @@ const removeCommaValue = (value: string, target: string) =>
 
 const CnpjProdutos = () => {
   const { profile, user } = useAuth();
-  const isAdmin = profile?.user_role === 'admin' || profile?.user_role === 'suporte';
+  const isAdmin = profile?.user_role === 'admin';
 
   const [produtos, setProdutos] = useState<CnpjProduto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -1230,6 +1230,11 @@ const CnpjProdutos = () => {
                       <div className="flex items-center justify-between gap-2">
                         <Badge variant={produto.status === 'ativo' ? 'default' : 'secondary'}>{statusLabel[produto.status]}</Badge>
                         <div className="inline-flex items-center gap-1">
+                          <Button variant="ghost" size="icon" asChild title="Abrir página de vendas">
+                            <a href={`/vendas/produto/${produto.id}`} target="_blank" rel="noreferrer">
+                              <ExternalLink className="h-4 w-4" />
+                            </a>
+                          </Button>
                           <Button variant="ghost" size="icon" onClick={() => handleEdit(produto)} title="Editar">
                             <Pencil className="h-4 w-4" />
                           </Button>
@@ -1298,6 +1303,11 @@ const CnpjProdutos = () => {
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="inline-flex items-center gap-1">
+                              <Button variant="ghost" size="icon" asChild title="Abrir página de vendas">
+                                <a href={`/vendas/produto/${produto.id}`} target="_blank" rel="noreferrer">
+                                  <ExternalLink className="h-4 w-4" />
+                                </a>
+                              </Button>
                               <Button variant="ghost" size="icon" onClick={() => handleEdit(produto)} title="Editar">
                                 <Pencil className="h-4 w-4" />
                               </Button>
