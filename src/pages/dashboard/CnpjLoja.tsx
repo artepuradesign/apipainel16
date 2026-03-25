@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import SimpleTitleBar from '@/components/dashboard/SimpleTitleBar';
-import { ShoppingBag, Star, Eye, Pencil, Trash2 } from 'lucide-react';
+import { ShoppingBag, Star, Eye, Pencil, Trash2, RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { cnpjProdutosService, type CnpjProduto } from '@/services/cnpjProdutosService';
@@ -237,7 +237,7 @@ const CnpjLoja = () => {
               Módulo #{MODULE_ID}
             </Badge>
             <Button variant="ghost" size="sm" onClick={loadProdutos} disabled={loading} className="h-8 w-8 p-0">
-              <ShoppingBag className="h-4 w-4" />
+              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             </Button>
           </>
         }
