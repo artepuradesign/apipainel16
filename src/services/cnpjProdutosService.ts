@@ -72,7 +72,7 @@ export interface BarcodeLookupLog {
   tempo_ms?: number;
 }
 
-async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
+async function apiRequest<T>(endpoint: string, options: RequestInit = {}, requireAuth: boolean = true): Promise<ApiResponse<T>> {
   try {
     await fetchApiConfig();
 
@@ -81,16 +81,17 @@ async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promi
       sessionToken = localStorage.getItem('session_token') || localStorage.getItem('api_session_token');
     }
 
-    if (!sessionToken) {
+    if (requireAuth && !sessionToken) {
       return { success: false, error: 'Token de autorização não encontrado. Faça login novamente.' };
     }
 
     const isFormData = options.body instanceof FormData;
+    const authorizationHeader = sessionToken ? { Authorization: `Bearer ${sessionToken}` } : {};
 
     const data = await centralApiRequest<any>(endpoint, {
       ...options,
       headers: {
-        Authorization: `Bearer ${sessionToken}`,
+        ...authorizationHeader,
         ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
         ...(options.headers || {}),
       },
@@ -192,5 +193,9 @@ export const cnpjProdutosService = {
     const barcode = codigoBarras.replace(/\s+/g, '').trim();
     const endpoint = `/cnpj-produtos/consultar-codigo?codigo_barras=${encodeURIComponent(barcode)}`;
     return apiRequest<BarcodeLookupData>(endpoint);
+  },
+
+  async detalhePublico(id: number) {
+    return apiRequest<CnpjProduto>(`/cnpj-produtos/detalhe-publico?id=${id}`, { method: 'GET' }, false);
   },
 };
