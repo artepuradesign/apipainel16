@@ -657,6 +657,7 @@ const CnpjProdutos = () => {
           tags: normalizedTags,
           marca: marcaProduto,
           external_featured_image_url: externalFeaturedImageUrl,
+          descricao_produto: descricaoProdutoHtml,
         });
 
         if (!result.success) {
@@ -676,6 +677,7 @@ const CnpjProdutos = () => {
           tags: normalizedTags,
           marca: marcaProduto,
           external_featured_image_url: externalFeaturedImageUrl,
+          descricao_produto: descricaoProdutoHtml,
           codigo_barras: parsed.data.codigo_barras,
           controlar_estoque: parsed.data.controlar_estoque,
           fotos: parsed.data.fotos,

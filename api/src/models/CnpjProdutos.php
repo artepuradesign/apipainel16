@@ -5,6 +5,8 @@ require_once __DIR__ . '/BaseModel.php';
 
 class CnpjProdutos extends BaseModel {
     protected $table = 'cnpj_produtos';
+    private $descriptionColumn = null;
+    private $descriptionColumnResolved = false;
 
     public function __construct($db) {
         parent::__construct($db);
@@ -163,12 +165,29 @@ class CnpjProdutos extends BaseModel {
     }
 
     public function createProduto(array $data, int $userId): int {
-        $query = "INSERT INTO {$this->table}
-            (module_id, user_id, cnpj, nome_empresa, nome_produto, sku, categoria, categoria_id, tags, marca, marca_id, external_featured_image_url, codigo_barras, controlar_estoque, fotos_json, preco, estoque, status, ativo)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)";
+        $columns = [
+            'module_id',
+            'user_id',
+            'cnpj',
+            'nome_empresa',
+            'nome_produto',
+            'sku',
+            'categoria',
+            'categoria_id',
+            'tags',
+            'marca',
+            'marca_id',
+            'external_featured_image_url',
+            'codigo_barras',
+            'controlar_estoque',
+            'fotos_json',
+            'preco',
+            'estoque',
+            'status',
+            'ativo',
+        ];
 
-        $stmt = $this->db->prepare($query);
-        $stmt->execute([
+        $values = [
             (int)($data['module_id'] ?? 183),
             $userId,
             $data['cnpj'],
@@ -187,7 +206,20 @@ class CnpjProdutos extends BaseModel {
             (float)$data['preco'],
             (int)$data['estoque'],
             $data['status'],
-        ]);
+            1,
+        ];
+
+        $descriptionColumn = $this->getDescriptionColumn();
+        if ($descriptionColumn !== null && (array_key_exists('descricao_produto', $data) || array_key_exists('descricao', $data))) {
+            $columns[] = $descriptionColumn;
+            $values[] = $data['descricao_produto'] ?? $data['descricao'] ?? null;
+        }
+
+        $placeholders = implode(', ', array_fill(0, count($columns), '?'));
+        $query = "INSERT INTO {$this->table} (" . implode(', ', $columns) . ") VALUES ({$placeholders})";
+
+        $stmt = $this->db->prepare($query);
+        $stmt->execute($values);
 
         return (int)$this->db->lastInsertId();
     }
@@ -197,6 +229,19 @@ class CnpjProdutos extends BaseModel {
         $params = [];
 
         $allowedFields = ['cnpj', 'nome_empresa', 'nome_produto', 'sku', 'categoria', 'categoria_id', 'tags', 'marca', 'marca_id', 'external_featured_image_url', 'codigo_barras', 'controlar_estoque', 'fotos_json', 'preco', 'estoque', 'status'];
+
+        $descriptionColumn = $this->getDescriptionColumn();
+        if ($descriptionColumn !== null) {
+            if ($descriptionColumn === 'descricao_produto' && array_key_exists('descricao', $fields) && !array_key_exists('descricao_produto', $fields)) {
+                $fields['descricao_produto'] = $fields['descricao'];
+            }
+
+            if ($descriptionColumn === 'descricao' && array_key_exists('descricao_produto', $fields) && !array_key_exists('descricao', $fields)) {
+                $fields['descricao'] = $fields['descricao_produto'];
+            }
+
+            $allowedFields[] = $descriptionColumn;
+        }
 
         foreach ($allowedFields as $field) {
             if (array_key_exists($field, $fields)) {
@@ -324,5 +369,25 @@ class CnpjProdutos extends BaseModel {
         $stmt = $this->db->prepare('SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?');
         $stmt->execute([$tableName]);
         return ((int)$stmt->fetchColumn()) > 0;
+    }
+
+    private function getDescriptionColumn(): ?string {
+        if ($this->descriptionColumnResolved) {
+            return $this->descriptionColumn;
+        }
+
+        foreach (['descricao_produto', 'descricao'] as $column) {
+            $stmt = $this->db->prepare("SHOW COLUMNS FROM {$this->table} LIKE ?");
+            $stmt->execute([$column]);
+            if ($stmt->fetch(PDO::FETCH_ASSOC)) {
+                $this->descriptionColumn = $column;
+                $this->descriptionColumnResolved = true;
+                return $this->descriptionColumn;
+            }
+        }
+
+        $this->descriptionColumn = null;
+        $this->descriptionColumnResolved = true;
+        return null;
     }
 }

@@ -424,6 +424,15 @@ class CnpjProdutosController {
             $result['nome_produto'] = $nomeProduto;
         }
 
+        if (array_key_exists('descricao_produto', $input) || array_key_exists('descricao', $input)) {
+            $rawDescricao = array_key_exists('descricao_produto', $input) ? $input['descricao_produto'] : $input['descricao'];
+            $descricao = trim((string)$rawDescricao);
+            $normalizedDescricao = $descricao === '' ? null : mb_substr($descricao, 0, 65535);
+
+            $result['descricao_produto'] = $normalizedDescricao;
+            $result['descricao'] = $normalizedDescricao;
+        }
+
         if (array_key_exists('sku', $input)) {
             $sku = trim((string)$input['sku']);
             $result['sku'] = $sku === '' ? null : mb_substr($sku, 0, 120);
@@ -595,6 +604,16 @@ class CnpjProdutosController {
         if (!empty($row['owner_cnpj'])) {
             $row['cnpj'] = $row['owner_cnpj'];
         }
+
+        $descricaoProduto = null;
+        if (array_key_exists('descricao_produto', $row) && trim((string)$row['descricao_produto']) !== '') {
+            $descricaoProduto = mb_substr(trim((string)$row['descricao_produto']), 0, 65535);
+        } elseif (array_key_exists('descricao', $row) && trim((string)$row['descricao']) !== '') {
+            $descricaoProduto = mb_substr(trim((string)$row['descricao']), 0, 65535);
+        }
+
+        $row['descricao_produto'] = $descricaoProduto;
+        $row['descricao'] = $descricaoProduto;
 
         $row['external_featured_image_url'] = !empty($row['external_featured_image_url']) ? (string)$row['external_featured_image_url'] : null;
         $row['controlar_estoque'] = ((int)($row['controlar_estoque'] ?? 0)) === 1;
