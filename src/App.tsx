@@ -410,6 +410,7 @@ function App() {
                     <Route path="/dashboard/imprimir-rg" element={<DashboardLayout><ImprimirRg /></DashboardLayout>} />
                     <Route path="/dashboard/pdf-personalizado" element={<DashboardLayout><PdfPersonalizado /></DashboardLayout>} />
                     <Route path="/dashboard/cnpj-produtos" element={<DashboardLayout><CnpjProdutos /></DashboardLayout>} />
+                    <Route path="/dashboard/cnpj-gerenciamento-produtos" element={<DashboardLayout><CnpjProdutos /></DashboardLayout>} />
                     <Route path="/dashboard/cnpj-loja" element={<DashboardLayout><CnpjLoja /></DashboardLayout>} />
                     <Route path="/dashboard/cnpj-produto" element={<DashboardLayout><CnpjProduto /></DashboardLayout>} />
                     <Route path="/dashboard/sistemas-dominio-com" element={<DashboardLayout><SistemasDominioCom /></DashboardLayout>} />
