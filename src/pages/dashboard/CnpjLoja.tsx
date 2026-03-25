@@ -1,10 +1,10 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import SimpleTitleBar from '@/components/dashboard/SimpleTitleBar';
-import { ShoppingBag, Star, Eye, Pencil, Trash2 } from 'lucide-react';
+import { ShoppingBag, Star, Eye, Pencil, Trash2, RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { cnpjProdutosService, type CnpjProduto } from '@/services/cnpjProdutosService';
@@ -45,31 +45,31 @@ const CnpjLoja = () => {
     [modules]
   );
 
-  useEffect(() => {
-    const load = async () => {
-      setLoading(true);
-      setError('');
+  const loadProdutos = useCallback(async () => {
+    setLoading(true);
+    setError('');
 
-      const result = await cnpjProdutosService.list({
-        limit: 200,
-        offset: 0,
-        cnpj: user?.cnpj || undefined,
-        status: 'ativo',
-      });
+    const result = await cnpjProdutosService.list({
+      limit: 200,
+      offset: 0,
+      cnpj: user?.cnpj || undefined,
+      status: 'ativo',
+    });
 
-      if (!result.success || !result.data) {
-        setProdutos([]);
-        setError(result.error || 'Não foi possível carregar sua loja.');
-        setLoading(false);
-        return;
-      }
-
-      setProdutos(result.data.data || []);
+    if (!result.success || !result.data) {
+      setProdutos([]);
+      setError(result.error || 'Não foi possível carregar sua loja.');
       setLoading(false);
-    };
+      return;
+    }
 
-    load();
+    setProdutos(result.data.data || []);
+    setLoading(false);
   }, [user?.cnpj]);
+
+  useEffect(() => {
+    loadProdutos();
+  }, [loadProdutos]);
 
   const sections = useMemo(() => splitStoreSections(produtos), [produtos]);
 
@@ -230,6 +230,16 @@ const CnpjLoja = () => {
         subtitle={
           currentModule?.description?.toString().trim() ||
           'Vitrine da sua empresa com produtos para venda'
+        }
+        right={
+          <>
+            <Badge variant="secondary" className="text-xs">
+              Módulo #{MODULE_ID}
+            </Badge>
+            <Button variant="ghost" size="sm" onClick={loadProdutos} disabled={loading} className="h-8 w-8 p-0">
+              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            </Button>
+          </>
         }
         onBack={() => navigate('/dashboard')}
       />
