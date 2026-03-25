@@ -910,12 +910,13 @@ const CnpjProdutos = () => {
         onBack={() => navigate('/dashboard')}
       />
 
-      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_380px] 2xl:grid-cols-[minmax(0,1fr)_420px] gap-4 sm:gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base sm:text-lg font-semibold tracking-tight">{editing ? 'Editar Produto' : 'Cadastro de Produto'}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+      {!showManagementSection ? (
+        <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_380px] 2xl:grid-cols-[minmax(0,1fr)_420px] gap-4 sm:gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base sm:text-lg font-semibold tracking-tight">{editing ? 'Editar Produto' : 'Cadastro de Produto'}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label htmlFor="cnpj">CNPJ *</Label>
@@ -1005,10 +1006,10 @@ const CnpjProdutos = () => {
                 </Button>
               )}
             </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        <div className="space-y-4">
+          <div className="space-y-4">
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm sm:text-base font-semibold tracking-tight">Publicar</CardTitle>
@@ -1209,8 +1210,9 @@ const CnpjProdutos = () => {
               />
             </CardContent>
           </Card>
+          </div>
         </div>
-      </div>
+      ) : null}
 
       {showManagementSection ? (
         <>
@@ -1413,34 +1415,6 @@ const CnpjProdutos = () => {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Resumo</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
-                <div className="flex items-center justify-between rounded-md border p-3">
-                  <span className="text-sm text-muted-foreground">Total</span>
-                  <span className="font-semibold">{resumo.total}</span>
-                </div>
-                <div className="flex items-center justify-between rounded-md border p-3">
-                  <span className="text-sm text-muted-foreground">Ativos</span>
-                  <span className="font-semibold">{resumo.ativos}</span>
-                </div>
-                <div className="flex items-center justify-between rounded-md border p-3">
-                  <span className="text-sm text-muted-foreground">Rascunho</span>
-                  <span className="font-semibold">{resumo.rascunho}</span>
-                </div>
-                <div className="flex items-center justify-between rounded-md border p-3">
-                  <span className="text-sm text-muted-foreground">Baixo estoque (≤ 5)</span>
-                  <span className="font-semibold">{resumo.baixoEstoque}</span>
-                </div>
-              </div>
-              <div className="pt-1 text-xs text-muted-foreground">
-                {isAdmin ? 'Você está vendo produtos de todos os usuários.' : 'Você está vendo apenas seus produtos.'}
-              </div>
-            </CardContent>
-          </Card>
         </>
       ) : null}
 
