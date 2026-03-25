@@ -119,6 +119,22 @@ class CnpjProdutos extends BaseModel {
         return $row ?: null;
     }
 
+    public function findPublicById(int $id): ?array {
+        $query = "SELECT p.*, u.full_name AS owner_name
+                  FROM {$this->table} p
+                  LEFT JOIN users u ON u.id = p.user_id
+                  WHERE p.id = ?
+                    AND p.ativo = 1
+                    AND p.status = 'ativo'
+                  LIMIT 1";
+
+        $stmt = $this->db->prepare($query);
+        $stmt->execute([$id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row ?: null;
+    }
+
     public function findByBarcodeForUser(string $barcode, int $userId, bool $isAdmin): ?array {
         $normalizedBarcode = preg_replace('/\D+/', '', $barcode);
         if ($normalizedBarcode === '') {
