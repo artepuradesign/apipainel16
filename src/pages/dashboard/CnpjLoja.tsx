@@ -4,11 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import SimpleTitleBar from '@/components/dashboard/SimpleTitleBar';
-import { Store, ShoppingBag, ShoppingCart, Star } from 'lucide-react';
+import { Store, ShoppingBag, Star, Eye, Pencil, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { cnpjProdutosService, type CnpjProduto } from '@/services/cnpjProdutosService';
 import { normalizeProductPhotos, splitStoreSections, STORE_HIGHLIGHT_LABELS, getHighlightFromTags } from '@/components/cnpj-loja/storefrontUtils';
+import { toast } from 'sonner';
 
 const formatPrice = (value: number) =>
   Number(value || 0).toLocaleString('pt-BR', {
@@ -64,6 +65,20 @@ const CnpjLoja = () => {
 
   const sections = useMemo(() => splitStoreSections(produtos), [produtos]);
 
+  const handleDeleteFromCard = async (produto: CnpjProduto) => {
+    const confirmed = window.confirm(`Deseja excluir o produto \"${produto.nome_produto}\"?`);
+    if (!confirmed) return;
+
+    const result = await cnpjProdutosService.excluir(produto.id);
+    if (!result.success) {
+      toast.error(result.error || 'Não foi possível excluir o produto.');
+      return;
+    }
+
+    setProdutos((prev) => prev.filter((item) => item.id !== produto.id));
+    toast.success('Produto excluído com sucesso.');
+  };
+
   const renderSection = (title: string, items: CnpjProduto[]) => {
     if (items.length === 0) return null;
 
@@ -87,26 +102,26 @@ const CnpjLoja = () => {
             return (
               <Card key={produto.id} className="h-full overflow-hidden rounded-2xl border-border/60 bg-card transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/10">
                 <CardContent className="p-0">
-                  <button
-                    type="button"
-                    onClick={() => navigate(`/dashboard/cnpj-produto?id=${produto.id}`)}
-                    className="group w-full text-left"
-                  >
+                  <div className="group w-full">
                     <div className="relative">
                       {image ? (
                         <img
                           src={image}
                           alt={`Imagem do produto ${produto.nome_produto}`}
                           loading="lazy"
-                           className="h-40 w-full border-b border-border/60 object-cover transition-transform duration-300 group-hover:scale-[1.02] sm:h-44"
+                          className="h-40 w-full border-b border-border/60 object-cover transition-transform duration-300 group-hover:scale-[1.02] sm:h-44"
                         />
                       ) : (
-                         <div className="flex h-40 w-full items-center justify-center border-b border-border/60 bg-muted/40 text-xs text-muted-foreground sm:h-44">
+                        <div className="flex h-40 w-full items-center justify-center border-b border-border/60 bg-muted/40 text-xs text-muted-foreground sm:h-44">
                           Sem imagem
                         </div>
                       )}
 
-                      <div className="absolute right-2 top-2">
+                      <Badge variant="secondary" className="absolute left-2 top-2 max-w-[62%] truncate text-[10px] shadow-sm">
+                        {produto.categoria || 'Sem categoria'}
+                      </Badge>
+
+                      <div className="absolute right-2 top-2 flex items-center gap-1.5">
                         <Button
                           type="button"
                           size="icon"
@@ -114,26 +129,50 @@ const CnpjLoja = () => {
                           className="h-8 w-8 rounded-full shadow-sm"
                           onClick={(event) => {
                             event.stopPropagation();
+                            window.open(`/vendas/produto/${produto.id}`, '_blank', 'noopener,noreferrer');
                           }}
-                          aria-label={`Adicionar ${produto.nome_produto} ao carrinho`}
+                          aria-label={`Visualizar página pública de ${produto.nome_produto}`}
                         >
-                          <ShoppingCart className="h-4 w-4" />
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          type="button"
+                          size="icon"
+                          variant="secondary"
+                          className="h-8 w-8 rounded-full shadow-sm"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            navigate('/dashboard/cnpj-produtos');
+                          }}
+                          aria-label={`Editar ${produto.nome_produto}`}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          type="button"
+                          size="icon"
+                          variant="secondary"
+                          className="h-8 w-8 rounded-full shadow-sm"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            handleDeleteFromCard(produto);
+                          }}
+                          aria-label={`Excluir ${produto.nome_produto}`}
+                        >
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
 
                       {highlight ? (
-                        <Badge className="absolute left-2 top-2 bg-primary text-primary-foreground">
+                        <Badge className="absolute left-2 top-10 bg-primary text-primary-foreground">
                           {STORE_HIGHLIGHT_LABELS[highlight]}
                         </Badge>
                       ) : null}
                     </div>
-                  </button>
+                  </div>
 
                   <div className="flex h-full flex-col gap-2.5 p-3 sm:p-4">
                     <div className="flex items-start justify-between gap-2">
-                      <Badge variant="secondary" className="w-fit max-w-[62%] truncate text-[10px]">
-                        {produto.categoria || 'Sem categoria'}
-                      </Badge>
                       <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
                         {Array.from({ length: 5 }).map((_, idx) => (
                           <Star key={idx} className="h-2.5 w-2.5" />
@@ -156,10 +195,6 @@ const CnpjLoja = () => {
                     <p className="line-clamp-2 min-h-[2rem] text-[11px] leading-relaxed text-muted-foreground">
                       em {installments}x de {formatPrice(installmentValue)} sem juros no cartão de crédito
                     </p>
-
-                    <Button size="sm" className="mt-auto w-full" onClick={() => navigate(`/dashboard/cnpj-produto?id=${produto.id}`)}>
-                      Ver produto
-                    </Button>
                   </div>
                 </CardContent>
               </Card>
