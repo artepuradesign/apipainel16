@@ -32,6 +32,7 @@ import IndicacoesPublicas from '@/pages/IndicacoesPublicas';
 import Modulos from '@/pages/Modulos';
 import ResetPassword from '@/pages/ResetPassword';
 import VendaProduto from '@/pages/VendaProduto';
+import VendaLoja from '@/pages/VendaLoja';
 
 import TermsOfService from '@/pages/TermsOfService';
 import PrivacyPolicy from '@/pages/PrivacyPolicy';
@@ -253,6 +254,7 @@ function App() {
                     <Route path="/indicacoes" element={<IndicacoesPublicas />} />
                     <Route path="/modulos" element={<Modulos />} />
                     <Route path="/vendas/produto/:id" element={<VendaProduto />} />
+                    <Route path="/vendas/loja/:cnpj" element={<VendaLoja />} />
                     <Route path="/public-plan-payment" element={<PublicPlanPayment />} />
                     <Route path="/temp" element={<TempConsulta />} />
                     
