@@ -45,6 +45,7 @@ export interface ApiUser {
   data_inicio?: string;
   data_fim?: string;
   premium_enabled?: boolean | number;
+  avatar_url?: string | null;
 }
 
 export interface AuthUser {
@@ -78,6 +79,7 @@ export interface AuthUser {
   data_inicio?: string;
   data_fim?: string;
   premium_enabled?: boolean | number;
+  avatar_url?: string | null;
 }
 
 export interface AuthApiResponse {
