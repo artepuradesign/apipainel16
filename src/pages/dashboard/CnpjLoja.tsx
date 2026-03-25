@@ -96,7 +96,7 @@ const CnpjLoja = () => {
       <section className="space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold tracking-tight">{title}</h2>
-          <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard/cnpj-produtos')}>
+          <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard/cnpj-gerenciamento-produtos')}>
             Gerenciar
           </Button>
         </div>
@@ -152,7 +152,7 @@ const CnpjLoja = () => {
                           className="h-8 w-8 rounded-full shadow-sm"
                           onClick={(event) => {
                             event.stopPropagation();
-                            navigate('/dashboard/cnpj-produtos');
+                            navigate('/dashboard/cnpj-gerenciamento-produtos');
                           }}
                           aria-label={`Editar ${produto.nome_produto}`}
                         >
@@ -232,7 +232,7 @@ const CnpjLoja = () => {
             <p className="text-sm text-muted-foreground">Destaque lançamentos, produtos mais vendidos e ofertas com atualização automática.</p>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => navigate('/dashboard/cnpj-produtos')}>Gerenciar produtos</Button>
+            <Button variant="outline" onClick={() => navigate('/dashboard/cnpj-gerenciamento-produtos')}>Gerenciar produtos</Button>
             <Button onClick={handleOpenOnlineStore}>
               <ShoppingBag className="h-4 w-4" />
               Loja Online
