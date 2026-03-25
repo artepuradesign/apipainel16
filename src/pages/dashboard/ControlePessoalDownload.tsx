@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Download, FileArchive, RefreshCw } from 'lucide-react';
+import { Download, RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import SimpleTitleBar from '@/components/dashboard/SimpleTitleBar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { useApiModules } from '@/hooks/useApiModules';
 import {
   controlePessoalDownloadService,
   type ControlePessoalDownloadFile,
@@ -25,10 +26,17 @@ const formatDate = (isoDate: string) => {
 };
 
 const ControlePessoalDownload = () => {
+  const MODULE_ID = 185;
   const navigate = useNavigate();
+  const { modules } = useApiModules();
   const [files, setFiles] = useState<ControlePessoalDownloadFile[]>([]);
   const [loading, setLoading] = useState(true);
   const [downloadingFile, setDownloadingFile] = useState<string | null>(null);
+
+  const currentModule = useMemo(
+    () => modules.find((module) => Number(module.id) === MODULE_ID) || null,
+    [modules]
+  );
 
   const sortedFiles = useMemo(
     () => [...files].sort((a, b) => a.name.localeCompare(b.name, 'pt-BR')),
@@ -75,10 +83,12 @@ const ControlePessoalDownload = () => {
   return (
     <div className="space-y-4 sm:space-y-6">
       <SimpleTitleBar
-        title="Controle Pessoal • Downloads"
-        subtitle="Baixe os arquivos disponíveis na pasta de download"
+        title={currentModule?.title?.toString().trim() || 'Controle Pessoal • Downloads'}
+        subtitle={
+          currentModule?.description?.toString().trim() ||
+          'Baixe os arquivos disponíveis na pasta de download'
+        }
         onBack={() => navigate('/dashboard')}
-        icon={<FileArchive className="h-5 w-5" />}
       />
 
       <Card>
