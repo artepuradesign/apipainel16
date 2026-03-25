@@ -23,7 +23,7 @@ class CnpjProdutosController {
                 return;
             }
 
-            $isAdmin = $this->isAdminOrSupport($userId);
+            $isAdmin = $this->isAdminUser($userId);
             $limit = isset($_GET['limit']) ? max(1, min(100, (int)$_GET['limit'])) : 50;
             $offset = isset($_GET['offset']) ? max(0, (int)$_GET['offset']) : 0;
 
@@ -52,6 +52,26 @@ class CnpjProdutosController {
             ], 'Produtos carregados com sucesso');
         } catch (Exception $e) {
             Response::error('Erro ao listar produtos: ' . $e->getMessage(), 500);
+        }
+    }
+
+    public function detalhePublico() {
+        try {
+            $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+            if ($id <= 0) {
+                Response::error('id inválido', 400);
+                return;
+            }
+
+            $produto = $this->model->findPublicById($id);
+            if (!$produto) {
+                Response::error('Produto não encontrado', 404);
+                return;
+            }
+
+            Response::success($this->normalizeProdutoRow($produto), 'Produto carregado com sucesso');
+        } catch (Exception $e) {
+            Response::error('Erro ao carregar produto: ' . $e->getMessage(), 500);
         }
     }
 
@@ -99,7 +119,7 @@ class CnpjProdutosController {
                 return;
             }
 
-            $isAdmin = $this->isAdminOrSupport($userId);
+            $isAdmin = $this->isAdminUser($userId);
             $input = $this->readJsonInput();
             if (!$input || !isset($input['id'])) {
                 Response::error('id é obrigatório', 400);
@@ -150,7 +170,7 @@ class CnpjProdutosController {
                 return;
             }
 
-            $isAdmin = $this->isAdminOrSupport($userId);
+            $isAdmin = $this->isAdminUser($userId);
             $input = $this->readJsonInput();
             if (!$input || !isset($input['id'])) {
                 Response::error('id é obrigatório', 400);
@@ -262,7 +282,7 @@ class CnpjProdutosController {
                 return;
             }
 
-            $isAdmin = $this->isAdminOrSupport($userId);
+            $isAdmin = $this->isAdminUser($userId);
             $lookupLog = [];
 
             $internalStart = microtime(true);
@@ -542,13 +562,13 @@ class CnpjProdutosController {
         return $result;
     }
 
-    private function isAdminOrSupport(int $userId): bool {
+    private function isAdminUser(int $userId): bool {
         $stmt = $this->db->prepare('SELECT user_role FROM users WHERE id = ? LIMIT 1');
         $stmt->execute([$userId]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         $role = $row['user_role'] ?? '';
 
-        return in_array($role, ['admin', 'suporte'], true);
+        return $role === 'admin';
     }
 
     private function formatCnpj(string $digits): string {
