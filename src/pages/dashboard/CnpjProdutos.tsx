@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { z } from 'zod';
 import { Package, Plus, RefreshCw, Pencil, Trash2, Search, ScanLine, ExternalLink } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import SimpleTitleBar from '@/components/dashboard/SimpleTitleBar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -345,7 +345,9 @@ const getStoreHighlightLabelFromTags = (tagsValue?: string | null) => {
 const CnpjProdutos = () => {
   const { profile, user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const isAdmin = profile?.user_role === 'admin';
+  const showManagementSection = location.pathname === '/dashboard/cnpj-gerenciamento-produtos';
 
   const [produtos, setProdutos] = useState<CnpjProduto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -893,6 +895,13 @@ const CnpjProdutos = () => {
             <Badge variant="secondary" className="text-xs">
               Módulo #{MODULE_ID}
             </Badge>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate(showManagementSection ? '/dashboard/cnpj-produtos' : '/dashboard/cnpj-gerenciamento-produtos')}
+            >
+              {showManagementSection ? 'Cadastro' : 'Gerenciamento'}
+            </Button>
             <Button variant="ghost" size="sm" onClick={loadProdutos} disabled={loading} className="h-8 w-8 p-0">
               <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             </Button>
@@ -1203,180 +1212,107 @@ const CnpjProdutos = () => {
         </div>
       </div>
 
-      <Card>
-        <CardHeader className="pb-3">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-            <CardTitle className="text-base sm:text-lg font-semibold tracking-tight">Gerenciamento de Produtos</CardTitle>
-            <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
-              <div className="relative">
-                <Search className="h-4 w-4 text-muted-foreground absolute left-2.5 top-1/2 -translate-y-1/2" />
-                <Input
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                   placeholder="Buscar por produto, empresa, SKU ou código"
-                  className="pl-8 w-full sm:w-[280px] lg:w-[320px]"
-                />
+      {showManagementSection ? (
+        <>
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                <CardTitle className="text-base sm:text-lg font-semibold tracking-tight">Gerenciamento de Produtos</CardTitle>
+                <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+                  <div className="relative">
+                    <Search className="h-4 w-4 text-muted-foreground absolute left-2.5 top-1/2 -translate-y-1/2" />
+                    <Input
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      placeholder="Buscar por produto, empresa, SKU ou código"
+                      className="pl-8 w-full sm:w-[280px] lg:w-[320px]"
+                    />
+                  </div>
+                  <Button type="button" variant="outline" onClick={openSearchScanner} className="w-full sm:w-auto">
+                    <ScanLine className="h-4 w-4" />
+                    Escanear
+                  </Button>
+                  <Select value={statusFilter} onValueChange={(value: 'todos' | ProdutoStatus) => setStatusFilter(value)}>
+                    <SelectTrigger className="w-full sm:w-[160px] text-sm">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="todos">Todos</SelectItem>
+                      <SelectItem value="ativo">Ativo</SelectItem>
+                      <SelectItem value="inativo">Inativo</SelectItem>
+                      <SelectItem value="rascunho">Rascunho</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button variant="outline" onClick={loadProdutos} disabled={loading} className="w-full sm:w-auto">
+                    <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+                    Atualizar
+                  </Button>
+                  <Button
+                    className="w-full sm:w-auto"
+                    onClick={() => {
+                      resetForm();
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                  >
+                    <Plus className="h-4 w-4" />
+                    Novo
+                  </Button>
+                </div>
               </div>
-              <Button type="button" variant="outline" onClick={openSearchScanner} className="w-full sm:w-auto">
-                <ScanLine className="h-4 w-4" />
-                Escanear
-              </Button>
-              <Select value={statusFilter} onValueChange={(value: 'todos' | ProdutoStatus) => setStatusFilter(value)}>
-                <SelectTrigger className="w-full sm:w-[160px] text-sm">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="todos">Todos</SelectItem>
-                  <SelectItem value="ativo">Ativo</SelectItem>
-                  <SelectItem value="inativo">Inativo</SelectItem>
-                  <SelectItem value="rascunho">Rascunho</SelectItem>
-                </SelectContent>
-              </Select>
-              <Button variant="outline" onClick={loadProdutos} disabled={loading} className="w-full sm:w-auto">
-                <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-                Atualizar
-              </Button>
-              <Button
-                className="w-full sm:w-auto"
-                onClick={() => {
-                  resetForm();
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
-              >
-                <Plus className="h-4 w-4" />
-                Novo
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="p-0 max-w-full overflow-hidden">
-          {loading ? (
-            <div className="py-12 text-center text-sm text-muted-foreground">Carregando produtos...</div>
-          ) : produtos.length === 0 ? (
-            <div className="py-12 text-center text-sm text-muted-foreground">Nenhum produto encontrado.</div>
-          ) : (
-            <>
-              <div className="lg:hidden space-y-3 p-3">
-                {produtos.map((produto) => {
-                  const firstPhoto = normalizeProductPhotos(produto.fotos, produto.fotos_json)[0];
-
-                  return (
-                    <div key={produto.id} className="rounded-md border p-3 space-y-3">
-                      <div className="flex items-start gap-3 min-w-0">
-                        {firstPhoto ? (
-                          <img
-                            src={firstPhoto}
-                            alt={`Foto do produto ${produto.nome_produto}`}
-                            loading="lazy"
-                            className="h-14 w-14 rounded object-cover border shrink-0"
-                          />
-                        ) : (
-                          <div className="h-14 w-14 rounded border bg-muted/40 flex items-center justify-center text-[10px] text-muted-foreground shrink-0">
-                            Sem foto
-                          </div>
-                        )}
-
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold truncate">{produto.nome_produto}</p>
-                          <p className="text-xs text-muted-foreground truncate">{produto.nome_empresa}</p>
-                          <p className="text-xs text-muted-foreground truncate">{produto.cnpj}</p>
-                          <p className="text-xs text-muted-foreground truncate">{produto.sku || 'Sem SKU'}</p>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-2 text-xs">
-                        <div className="rounded border p-2">
-                          <p className="text-muted-foreground">Preço</p>
-                          <p className="font-medium">R$ {Number(produto.preco).toFixed(2).replace('.', ',')}</p>
-                        </div>
-                        <div className="rounded border p-2">
-                          <p className="text-muted-foreground">Estoque</p>
-                          <p className="font-medium">{produto.controlar_estoque === true || produto.controlar_estoque === 1 ? produto.estoque : '—'}</p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-1.5">
-                          <Badge variant={produto.status === 'ativo' ? 'default' : 'secondary'}>{statusLabel[produto.status]}</Badge>
-                          {getStoreHighlightLabelFromTags(produto.tags) ? (
-                            <Badge variant="outline">{getStoreHighlightLabelFromTags(produto.tags)}</Badge>
-                          ) : null}
-                        </div>
-                        <div className="inline-flex items-center gap-1">
-                          <Button variant="ghost" size="icon" asChild title="Abrir página de vendas">
-                            <a href={`/vendas/produto/${produto.id}`} target="_blank" rel="noreferrer">
-                              <ExternalLink className="h-4 w-4" />
-                            </a>
-                          </Button>
-                          <Button variant="ghost" size="icon" onClick={() => handleEdit(produto)} title="Editar">
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon" onClick={() => setDeleteTarget(produto)} title="Excluir">
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div className="hidden lg:block w-full overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Foto</TableHead>
-                      <TableHead>ID</TableHead>
-                      <TableHead>Empresa / CNPJ</TableHead>
-                      <TableHead>Produto</TableHead>
-                      <TableHead>Preço</TableHead>
-                      <TableHead>Estoque</TableHead>
-                      <TableHead>Classificação</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Ações</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
+            </CardHeader>
+            <CardContent className="p-0 max-w-full overflow-hidden">
+              {loading ? (
+                <div className="py-12 text-center text-sm text-muted-foreground">Carregando produtos...</div>
+              ) : produtos.length === 0 ? (
+                <div className="py-12 text-center text-sm text-muted-foreground">Nenhum produto encontrado.</div>
+              ) : (
+                <>
+                  <div className="lg:hidden space-y-3 p-3">
                     {produtos.map((produto) => {
                       const firstPhoto = normalizeProductPhotos(produto.fotos, produto.fotos_json)[0];
 
                       return (
-                        <TableRow key={produto.id}>
-                          <TableCell>
+                        <div key={produto.id} className="rounded-md border p-3 space-y-3">
+                          <div className="flex items-start gap-3 min-w-0">
                             {firstPhoto ? (
                               <img
                                 src={firstPhoto}
                                 alt={`Foto do produto ${produto.nome_produto}`}
                                 loading="lazy"
-                                className="h-12 w-12 rounded object-cover border"
+                                className="h-14 w-14 rounded object-cover border shrink-0"
                               />
                             ) : (
-                              <div className="h-12 w-12 rounded border bg-muted/40 flex items-center justify-center text-[10px] text-muted-foreground">
+                              <div className="h-14 w-14 rounded border bg-muted/40 flex items-center justify-center text-[10px] text-muted-foreground shrink-0">
                                 Sem foto
                               </div>
                             )}
-                          </TableCell>
-                          <TableCell className="font-medium">#{produto.id}</TableCell>
-                          <TableCell>
-                            <div className="flex flex-col">
-                              <span className="text-sm font-medium">{produto.nome_empresa}</span>
-                              <span className="text-xs text-muted-foreground">{produto.cnpj}</span>
+
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold truncate">{produto.nome_produto}</p>
+                              <p className="text-xs text-muted-foreground truncate">{produto.nome_empresa}</p>
+                              <p className="text-xs text-muted-foreground truncate">{produto.cnpj}</p>
+                              <p className="text-xs text-muted-foreground truncate">{produto.sku || 'Sem SKU'}</p>
                             </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex flex-col">
-                              <span className="text-sm font-medium">{produto.nome_produto}</span>
-                              <span className="text-xs text-muted-foreground">{produto.sku || 'Sem SKU'}</span>
-                              <span className="text-xs text-muted-foreground">{produto.codigo_barras || 'Sem código de barras'}</span>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-2 text-xs">
+                            <div className="rounded border p-2">
+                              <p className="text-muted-foreground">Preço</p>
+                              <p className="font-medium">R$ {Number(produto.preco).toFixed(2).replace('.', ',')}</p>
                             </div>
-                          </TableCell>
-                          <TableCell>R$ {Number(produto.preco).toFixed(2).replace('.', ',')}</TableCell>
-                          <TableCell>{produto.controlar_estoque === true || produto.controlar_estoque === 1 ? produto.estoque : '—'}</TableCell>
-                          <TableCell>{getStoreHighlightLabelFromTags(produto.tags) || '—'}</TableCell>
-                          <TableCell>
-                            <Badge variant={produto.status === 'ativo' ? 'default' : 'secondary'}>{statusLabel[produto.status]}</Badge>
-                          </TableCell>
-                          <TableCell className="text-right">
+                            <div className="rounded border p-2">
+                              <p className="text-muted-foreground">Estoque</p>
+                              <p className="font-medium">{produto.controlar_estoque === true || produto.controlar_estoque === 1 ? produto.estoque : '—'}</p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-1.5">
+                              <Badge variant={produto.status === 'ativo' ? 'default' : 'secondary'}>{statusLabel[produto.status]}</Badge>
+                              {getStoreHighlightLabelFromTags(produto.tags) ? (
+                                <Badge variant="outline">{getStoreHighlightLabelFromTags(produto.tags)}</Badge>
+                              ) : null}
+                            </div>
                             <div className="inline-flex items-center gap-1">
                               <Button variant="ghost" size="icon" asChild title="Abrir página de vendas">
                                 <a href={`/vendas/produto/${produto.id}`} target="_blank" rel="noreferrer">
@@ -1390,46 +1326,123 @@ const CnpjProdutos = () => {
                                 <Trash2 className="h-4 w-4" />
                               </Button>
                             </div>
-                          </TableCell>
-                        </TableRow>
+                          </div>
+                        </div>
                       );
                     })}
-                  </TableBody>
-                </Table>
-              </div>
-            </>
-          )}
-        </CardContent>
-      </Card>
+                  </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Resumo</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
-            <div className="flex items-center justify-between rounded-md border p-3">
-              <span className="text-sm text-muted-foreground">Total</span>
-              <span className="font-semibold">{resumo.total}</span>
-            </div>
-            <div className="flex items-center justify-between rounded-md border p-3">
-              <span className="text-sm text-muted-foreground">Ativos</span>
-              <span className="font-semibold">{resumo.ativos}</span>
-            </div>
-            <div className="flex items-center justify-between rounded-md border p-3">
-              <span className="text-sm text-muted-foreground">Rascunho</span>
-              <span className="font-semibold">{resumo.rascunho}</span>
-            </div>
-            <div className="flex items-center justify-between rounded-md border p-3">
-              <span className="text-sm text-muted-foreground">Baixo estoque (≤ 5)</span>
-              <span className="font-semibold">{resumo.baixoEstoque}</span>
-            </div>
-          </div>
-          <div className="pt-1 text-xs text-muted-foreground">
-            {isAdmin ? 'Você está vendo produtos de todos os usuários.' : 'Você está vendo apenas seus produtos.'}
-          </div>
-        </CardContent>
-      </Card>
+                  <div className="hidden lg:block w-full overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Foto</TableHead>
+                          <TableHead>ID</TableHead>
+                          <TableHead>Empresa / CNPJ</TableHead>
+                          <TableHead>Produto</TableHead>
+                          <TableHead>Preço</TableHead>
+                          <TableHead>Estoque</TableHead>
+                          <TableHead>Classificação</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead className="text-right">Ações</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {produtos.map((produto) => {
+                          const firstPhoto = normalizeProductPhotos(produto.fotos, produto.fotos_json)[0];
+
+                          return (
+                            <TableRow key={produto.id}>
+                              <TableCell>
+                                {firstPhoto ? (
+                                  <img
+                                    src={firstPhoto}
+                                    alt={`Foto do produto ${produto.nome_produto}`}
+                                    loading="lazy"
+                                    className="h-12 w-12 rounded object-cover border"
+                                  />
+                                ) : (
+                                  <div className="h-12 w-12 rounded border bg-muted/40 flex items-center justify-center text-[10px] text-muted-foreground">
+                                    Sem foto
+                                  </div>
+                                )}
+                              </TableCell>
+                              <TableCell className="font-medium">#{produto.id}</TableCell>
+                              <TableCell>
+                                <div className="flex flex-col">
+                                  <span className="text-sm font-medium">{produto.nome_empresa}</span>
+                                  <span className="text-xs text-muted-foreground">{produto.cnpj}</span>
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                <div className="flex flex-col">
+                                  <span className="text-sm font-medium">{produto.nome_produto}</span>
+                                  <span className="text-xs text-muted-foreground">{produto.sku || 'Sem SKU'}</span>
+                                  <span className="text-xs text-muted-foreground">{produto.codigo_barras || 'Sem código de barras'}</span>
+                                </div>
+                              </TableCell>
+                              <TableCell>R$ {Number(produto.preco).toFixed(2).replace('.', ',')}</TableCell>
+                              <TableCell>{produto.controlar_estoque === true || produto.controlar_estoque === 1 ? produto.estoque : '—'}</TableCell>
+                              <TableCell>{getStoreHighlightLabelFromTags(produto.tags) || '—'}</TableCell>
+                              <TableCell>
+                                <Badge variant={produto.status === 'ativo' ? 'default' : 'secondary'}>{statusLabel[produto.status]}</Badge>
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <div className="inline-flex items-center gap-1">
+                                  <Button variant="ghost" size="icon" asChild title="Abrir página de vendas">
+                                    <a href={`/vendas/produto/${produto.id}`} target="_blank" rel="noreferrer">
+                                      <ExternalLink className="h-4 w-4" />
+                                    </a>
+                                  </Button>
+                                  <Button variant="ghost" size="icon" onClick={() => handleEdit(produto)} title="Editar">
+                                    <Pencil className="h-4 w-4" />
+                                  </Button>
+                                  <Button variant="ghost" size="icon" onClick={() => setDeleteTarget(produto)} title="Excluir">
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Resumo</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
+                <div className="flex items-center justify-between rounded-md border p-3">
+                  <span className="text-sm text-muted-foreground">Total</span>
+                  <span className="font-semibold">{resumo.total}</span>
+                </div>
+                <div className="flex items-center justify-between rounded-md border p-3">
+                  <span className="text-sm text-muted-foreground">Ativos</span>
+                  <span className="font-semibold">{resumo.ativos}</span>
+                </div>
+                <div className="flex items-center justify-between rounded-md border p-3">
+                  <span className="text-sm text-muted-foreground">Rascunho</span>
+                  <span className="font-semibold">{resumo.rascunho}</span>
+                </div>
+                <div className="flex items-center justify-between rounded-md border p-3">
+                  <span className="text-sm text-muted-foreground">Baixo estoque (≤ 5)</span>
+                  <span className="font-semibold">{resumo.baixoEstoque}</span>
+                </div>
+              </div>
+              <div className="pt-1 text-xs text-muted-foreground">
+                {isAdmin ? 'Você está vendo produtos de todos os usuários.' : 'Você está vendo apenas seus produtos.'}
+              </div>
+            </CardContent>
+          </Card>
+        </>
+      ) : null}
 
       <Dialog
         open={taxonomyModal.open}
