@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import SimpleTitleBar from '@/components/dashboard/SimpleTitleBar';
-import { Store, ShoppingBag } from 'lucide-react';
+import { Store, ShoppingBag, ShoppingCart, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { cnpjProdutosService, type CnpjProduto } from '@/services/cnpjProdutosService';
@@ -15,6 +15,19 @@ const formatPrice = (value: number) =>
     style: 'currency',
     currency: 'BRL',
   });
+
+const getDiscountByHighlight = (highlight: ReturnType<typeof getHighlightFromTags>) => {
+  if (highlight === 'ofertas') return 15;
+  if (highlight === 'mais_vendidos') return 10;
+  return 0;
+};
+
+const getInstallments = (price: number) => {
+  if (price >= 400) return 8;
+  if (price >= 250) return 6;
+  if (price >= 160) return 4;
+  return 2;
+};
 
 const CnpjLoja = () => {
   const navigate = useNavigate();
@@ -62,40 +75,88 @@ const CnpjLoja = () => {
             Gerenciar
           </Button>
         </div>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
           {items.map((produto) => {
             const image = normalizeProductPhotos(produto)[0] || '';
             const highlight = getHighlightFromTags(produto.tags);
+            const discountPercent = getDiscountByHighlight(highlight);
+            const pixPrice = discountPercent > 0 ? produto.preco * (1 - discountPercent / 100) : produto.preco;
+            const installments = getInstallments(produto.preco);
+            const installmentValue = produto.preco / installments;
 
             return (
-              <Card key={produto.id} className="overflow-hidden">
-                <CardContent className="space-y-3 p-3">
+              <Card key={produto.id} className="overflow-hidden rounded-xl border-border/70 transition-all hover:shadow-md hover:shadow-primary/10">
+                <CardContent className="space-y-3 p-0">
                   <button
                     type="button"
                     onClick={() => navigate(`/dashboard/cnpj-produto?id=${produto.id}`)}
-                    className="w-full text-left"
+                    className="group w-full text-left"
                   >
-                    {image ? (
-                      <img
-                        src={image}
-                        alt={`Imagem do produto ${produto.nome_produto}`}
-                        loading="lazy"
-                        className="h-40 w-full rounded-md border object-cover"
-                      />
-                    ) : (
-                      <div className="flex h-40 w-full items-center justify-center rounded-md border bg-muted/40 text-xs text-muted-foreground">
-                        Sem imagem
+                    <div className="relative">
+                      {image ? (
+                        <img
+                          src={image}
+                          alt={`Imagem do produto ${produto.nome_produto}`}
+                          loading="lazy"
+                          className="h-48 w-full border-b border-border/60 object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                        />
+                      ) : (
+                        <div className="flex h-48 w-full items-center justify-center border-b border-border/60 bg-muted/40 text-xs text-muted-foreground">
+                          Sem imagem
+                        </div>
+                      )}
+
+                      <div className="absolute right-2 top-2">
+                        <Button
+                          type="button"
+                          size="icon"
+                          variant="secondary"
+                          className="h-9 w-9 rounded-full shadow-sm"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                          }}
+                          aria-label={`Adicionar ${produto.nome_produto} ao carrinho`}
+                        >
+                          <ShoppingCart className="h-4 w-4" />
+                        </Button>
                       </div>
-                    )}
+
+                      {highlight ? (
+                        <Badge className="absolute left-2 top-2 bg-primary text-primary-foreground">
+                          {STORE_HIGHLIGHT_LABELS[highlight]}
+                        </Badge>
+                      ) : null}
+                    </div>
                   </button>
 
-                  <div className="space-y-2">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Badge variant="secondary">{produto.categoria || 'Sem categoria'}</Badge>
-                      {highlight ? <Badge variant="outline">{STORE_HIGHLIGHT_LABELS[highlight]}</Badge> : null}
+                  <div className="space-y-2 p-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <Badge variant="secondary" className="max-w-[70%] truncate">
+                        {produto.categoria || 'Sem categoria'}
+                      </Badge>
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                        {Array.from({ length: 5 }).map((_, idx) => (
+                          <Star key={idx} className="h-3 w-3" />
+                        ))}
+                        <span>0.0 (0)</span>
+                      </div>
                     </div>
-                    <h3 className="line-clamp-2 text-sm font-semibold leading-snug">{produto.nome_produto}</h3>
-                    <p className="text-lg font-bold">{formatPrice(produto.preco)}</p>
+
+                    <h3 className="line-clamp-2 min-h-[2.5rem] text-sm font-semibold leading-snug">{produto.nome_produto}</h3>
+
+                    {discountPercent > 0 ? (
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground line-through">{formatPrice(produto.preco)}</span>
+                        <Badge variant="outline" className="text-xs">{discountPercent}%</Badge>
+                      </div>
+                    ) : null}
+
+                    <p className="text-lg font-bold text-foreground">{formatPrice(pixPrice)} no Pix</p>
+
+                    <p className="text-xs text-muted-foreground">
+                      em {installments}x de {formatPrice(installmentValue)} sem juros no cartão de crédito
+                    </p>
+
                     <Button className="w-full" onClick={() => navigate(`/dashboard/cnpj-produto?id=${produto.id}`)}>
                       Ver produto
                     </Button>
