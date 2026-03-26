@@ -146,19 +146,6 @@ const MenuSuperior = () => {
             </div>
 
             <div className="hidden md:flex items-center space-x-4">
-              {user && (
-                <Link to="/dashboard">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-8 rounded-lg px-3 text-xs font-medium bg-background text-foreground border-border hover:bg-muted"
-                  >
-                    <PanelLeft className="mr-1.5 h-3.5 w-3.5" />
-                    {content.sidebarOnlinePanels}
-                  </Button>
-                </Link>
-              )}
-
               <nav className="hidden lg:flex items-center space-x-1">
                 {!isHomePage && (
                   <Link to="/">
@@ -171,6 +158,18 @@ const MenuSuperior = () => {
                 <Link to="/planos-publicos">
                   <Button variant="ghost" size="sm" className={cn("text-muted-foreground hover:text-foreground", liquidGlassConfig.enabled && "hover:bg-white/10")}>{content.plans}</Button>
                 </Link>
+                {user && (
+                  <Link to="/dashboard">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-8 rounded-lg px-3 text-xs font-medium bg-background text-foreground border-border hover:bg-muted"
+                    >
+                      <PanelLeft className="mr-1.5 h-3.5 w-3.5" />
+                      {content.sidebarOnlinePanels}
+                    </Button>
+                  </Link>
+                )}
                 {!isDashboardPage && (
                   <Link to="/dashboard">
                     <Button variant="ghost" size="sm" className={cn("menu-paineis-link text-muted-foreground hover:text-foreground font-semibold", liquidGlassConfig.enabled && "hover:bg-white/10")}>{content.panels}</Button>
