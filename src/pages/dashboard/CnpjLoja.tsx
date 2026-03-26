@@ -102,7 +102,7 @@ const CnpjLoja = () => {
 
     return (
       <section className="space-y-3">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-lg font-semibold tracking-tight">{title}</h2>
           <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard/cnpj-gerenciamento-produtos')}>
             Gerenciar
@@ -251,9 +251,9 @@ const CnpjLoja = () => {
             <h1 className="text-xl font-semibold tracking-tight">Sua loja online pronta para vender</h1>
             <p className="text-sm text-muted-foreground">Destaque lançamentos, produtos mais vendidos e ofertas com atualização automática.</p>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={() => navigate('/dashboard/cnpj-gerenciamento-produtos')}>Gerenciar produtos</Button>
-            <Button onClick={handleOpenOnlineStore}>
+          <div className="grid w-full grid-cols-1 gap-2 sm:w-auto sm:grid-cols-2">
+            <Button variant="outline" className="w-full" onClick={() => navigate('/dashboard/cnpj-gerenciamento-produtos')}>Gerenciar produtos</Button>
+            <Button className="w-full" onClick={handleOpenOnlineStore}>
               <ShoppingBag className="h-4 w-4" />
               Loja Online
             </Button>
