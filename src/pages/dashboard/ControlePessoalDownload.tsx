@@ -92,7 +92,7 @@ const ControlePessoalDownload = () => {
       />
 
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between gap-3">
+        <CardHeader className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
           <CardTitle>Arquivos disponíveis</CardTitle>
           <Button type="button" variant="outline" size="sm" onClick={loadFiles} disabled={loading}>
             <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
