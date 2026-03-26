@@ -160,7 +160,9 @@ const CnpjLoja = () => {
                           className="h-8 w-8 rounded-full shadow-sm"
                           onClick={(event) => {
                             event.stopPropagation();
-                            navigate('/dashboard/cnpj-gerenciamento-produtos');
+                            navigate('/dashboard/cnpj-produtos', {
+                              state: { editingProduct: produto },
+                            });
                           }}
                           aria-label={`Editar ${produto.nome_produto}`}
                         >
