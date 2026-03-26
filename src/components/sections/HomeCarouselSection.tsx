@@ -69,7 +69,7 @@ const homeCarouselContent: Record<Locale, HomeCarouselContent> = {
       },
       {
         title: 'Controle de Estoque e Vendas',
-        subtitle: 'Acompanhe saldo, estoque e performance comercial',
+        subtitle: 'Acompanhe saldo, estoque e performance ',
         description: 'Tenha visão clara do que entra, sai e vende mais para tomar decisões com agilidade.',
         image: slide04,
       },
