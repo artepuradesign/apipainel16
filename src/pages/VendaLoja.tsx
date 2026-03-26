@@ -55,7 +55,7 @@ const VendaLoja = () => {
 
     return (
       <section className="space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-lg font-semibold tracking-tight md:text-2xl">{title}</h2>
           <Badge variant="secondary" className="text-xs">{items.length} produtos</Badge>
         </div>
@@ -147,7 +147,7 @@ const VendaLoja = () => {
 
   return (
     <main className="min-h-screen bg-background">
-      <section className="mx-auto max-w-7xl space-y-8 px-4 py-8 md:px-6 md:py-10">
+      <section className="mx-auto max-w-7xl space-y-8 overflow-x-hidden px-4 py-8 md:px-6 md:py-10">
         <header className="rounded-2xl border border-border/60 bg-card p-5 shadow-sm md:p-6">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="flex items-center gap-4">
@@ -159,9 +159,9 @@ const VendaLoja = () => {
                 </div>
               )}
 
-              <div>
+              <div className="min-w-0">
                 <h1 className="text-2xl font-bold tracking-tight md:text-3xl">{empresa?.nome_empresa || 'Loja Online'}</h1>
-                <p className="text-sm text-muted-foreground">CNPJ {empresa?.cnpj || '--'} • Catálogo público da empresa</p>
+                <p className="break-all text-sm text-muted-foreground">CNPJ {empresa?.cnpj || '--'} • Catálogo público da empresa</p>
               </div>
             </div>
 

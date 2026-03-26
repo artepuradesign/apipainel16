@@ -166,7 +166,7 @@ const SimpleTitleBar = ({
       style={liquidGlassConfig.enabled ? glassStyle : undefined}
     >
       <CardHeader className="px-4 md:px-6">
-        <div className="flex items-start justify-between gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-center gap-3 flex-1 min-w-0">
             {/* Ícone à esquerda ocupando espaço das duas linhas */}
             {iconElement}
@@ -184,7 +184,7 @@ const SimpleTitleBar = ({
             </div>
           </div>
 
-          <div className="flex shrink-0 items-center gap-2">
+          <div className="flex w-full flex-wrap items-center justify-start gap-2 sm:w-auto sm:shrink-0 sm:justify-end">
             {right ? right : null}
             <Button
               variant="outline"
