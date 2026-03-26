@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { RefreshCw, X, LogOut, Wallet, Eye, EyeOff, Languages } from 'lucide-react';
+import { RefreshCw, X, LogOut, Wallet, Eye, EyeOff, Languages, PanelLeft } from 'lucide-react';
 import NotificationIcon from '@/components/notifications/NotificationIcon';
 import ThemeSwitcher from '@/components/ThemeSwitcher';
 import { useAuth } from '@/contexts/AuthContext';
@@ -96,6 +96,12 @@ const UserWalletDropdown = ({ onLogout }: UserWalletDropdownProps) => {
     window.dispatchEvent(new CustomEvent('balanceUpdated', {
       detail: { timestamp: Date.now(), shouldAnimate: true },
     }));
+  };
+
+  const handleOpenPanels = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    navigate('/dashboard');
+    setIsOpen(false);
   };
 
   const openLanguageModal = () => {
@@ -199,6 +205,15 @@ const UserWalletDropdown = ({ onLogout }: UserWalletDropdownProps) => {
                       <div onClick={(e) => e.stopPropagation()}>
                         <NotificationIcon />
                       </div>
+                      <button
+                        type="button"
+                        aria-label={content.sidebarOnlinePanels}
+                        title={content.sidebarOnlinePanels}
+                        onClick={handleOpenPanels}
+                        className="h-8 w-8 rounded-md flex items-center justify-center border border-border bg-background text-foreground hover:bg-muted transition-colors"
+                      >
+                        <PanelLeft className="h-4 w-4" />
+                      </button>
                     </div>
                     <Button
                       variant="ghost"
