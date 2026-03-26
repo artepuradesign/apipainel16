@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import SimpleTitleBar from '@/components/dashboard/SimpleTitleBar';
-import { ShoppingBag, Star, Eye, Pencil, Trash2, RefreshCw } from 'lucide-react';
+import { ShoppingBag, Star, Eye, Pencil, Trash2, RefreshCw, Package } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { cnpjProdutosService, type CnpjProduto } from '@/services/cnpjProdutosService';
@@ -233,6 +233,7 @@ const CnpjLoja = () => {
           currentModule?.description?.toString().trim() ||
           'Vitrine da sua empresa com produtos para venda'
         }
+        icon={<Package className="h-4 w-4 sm:h-5 sm:w-5" />}
         right={
           <>
             <Button variant="ghost" size="sm" onClick={loadProdutos} disabled={loading} className="h-8 w-8 p-0">
