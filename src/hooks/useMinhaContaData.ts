@@ -42,6 +42,33 @@ interface UserData {
   subscription_status?: string;
 }
 
+const formatBirthDateToBR = (value?: string): string | undefined => {
+  if (!value) return value;
+
+  const trimmed = value.trim();
+  if (!trimmed) return trimmed;
+
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(trimmed)) {
+    return trimmed;
+  }
+
+  const isoMatch = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (isoMatch) {
+    const [, year, month, day] = isoMatch;
+    return `${day}/${month}/${year}`;
+  }
+
+  const parsed = new Date(trimmed);
+  if (!Number.isNaN(parsed.getTime())) {
+    const day = String(parsed.getDate()).padStart(2, '0');
+    const month = String(parsed.getMonth() + 1).padStart(2, '0');
+    const year = parsed.getFullYear();
+    return `${day}/${month}/${year}`;
+  }
+
+  return trimmed;
+};
+
 export const useMinhaContaData = () => {
   const { user } = useAuth();
   const [userData, setUserData] = useState<UserData | null>(null);
@@ -67,7 +94,7 @@ export const useMinhaContaData = () => {
             full_name: user.full_name,
             cpf: user.cpf,
             cnpj: user.cnpj,
-            data_nascimento: user.data_nascimento,
+            data_nascimento: formatBirthDateToBR(user.data_nascimento),
             telefone: user.telefone,
             cep: user.cep,
             endereco: user.endereco,
@@ -118,7 +145,7 @@ export const useMinhaContaData = () => {
                   full_name: apiUser.full_name,
                   cpf: apiUser.cpf,
                   cnpj: apiUser.cnpj,
-                  data_nascimento: apiUser.data_nascimento,
+                   data_nascimento: formatBirthDateToBR(apiUser.data_nascimento),
                   telefone: apiUser.telefone,
                   cep: apiUser.cep,
                   endereco: apiUser.endereco,
