@@ -139,7 +139,7 @@ const MenuSuperior = () => {
               </div>
             </div>
 
-            <div className="md:hidden flex items-center gap-2">
+            <div className="md:hidden flex items-center gap-3">
               <TextLogo to="/dashboard" showFullOnMobile={!user} />
               <ThemeSwitcher />
             </div>
@@ -218,7 +218,7 @@ const MenuSuperior = () => {
               )}
             </div>
 
-            <div className="md:hidden flex items-center gap-2">
+            <div className="md:hidden flex items-center gap-3">
               {user && (
                 <UserWalletDropdown onLogout={handleLogout} />
               )}
