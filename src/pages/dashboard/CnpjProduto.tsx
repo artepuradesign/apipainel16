@@ -71,7 +71,7 @@ const CnpjProduto = () => {
   const imagemPrincipal = selectedImage || imagens[0] || '';
 
   return (
-    <div className="space-y-4 sm:space-y-6 px-1 sm:px-0">
+    <div className="space-y-4 sm:space-y-6 px-1 sm:px-0 max-w-full overflow-x-hidden">
       <SimpleTitleBar
         title="Produto para venda"
         subtitle="Página de exibição comercial do produto selecionado"
@@ -165,10 +165,10 @@ const CnpjProduto = () => {
                       params.set('id', String(item.id));
                       setSearchParams(params);
                     }}
-                    className="flex w-full items-center justify-between rounded-md border px-3 py-2 text-left text-sm"
+                    className="flex w-full items-center justify-between gap-2 rounded-md border px-3 py-2 text-left text-sm"
                   >
-                    <span className="truncate pr-2">{item.nome_produto}</span>
-                    <span className="font-medium">{formatPrice(item.preco)}</span>
+                    <span className="min-w-0 flex-1 truncate pr-2">{item.nome_produto}</span>
+                    <span className="shrink-0 font-medium">{formatPrice(item.preco)}</span>
                   </button>
                 ))}
               </CardContent>
