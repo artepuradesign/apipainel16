@@ -900,16 +900,20 @@ const CnpjProdutos = () => {
         icon={<Package className="h-4 w-4 sm:h-5 sm:w-5" />}
         right={
           <>
-            <Badge variant="secondary" className="text-xs">
-              Módulo #{MODULE_ID}
-            </Badge>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate(showManagementSection ? '/dashboard/cnpj-produtos' : '/dashboard/cnpj-gerenciamento-produtos')}
-            >
-              {showManagementSection ? 'Cadastro' : 'Gerenciamento'}
-            </Button>
+            {!showManagementSection ? (
+              <Badge variant="secondary" className="text-xs">
+                Módulo #{MODULE_ID}
+              </Badge>
+            ) : null}
+            {!showManagementSection ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate('/dashboard/cnpj-gerenciamento-produtos')}
+              >
+                Gerenciamento
+              </Button>
+            ) : null}
             <Button variant="ghost" size="sm" onClick={loadProdutos} disabled={loading} className="h-8 w-8 p-0">
               <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             </Button>
@@ -1253,10 +1257,6 @@ const CnpjProdutos = () => {
                       <SelectItem value="rascunho">Rascunho</SelectItem>
                     </SelectContent>
                   </Select>
-                  <Button variant="outline" onClick={loadProdutos} disabled={loading} className="w-full sm:w-auto">
-                    <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-                    Atualizar
-                  </Button>
                   <Button
                     className="w-full sm:w-auto"
                     onClick={() => {
