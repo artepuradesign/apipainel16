@@ -39,7 +39,7 @@ const homeCarouselContent: Record<Locale, HomeCarouselContent> = {
     slides: [
       {
         title: 'Gerencie Produtos e Estoque',
-        subtitle: 'Cadastre produtos, gerencie o estoque da sua empresa',
+        subtitle: 'Cadastre produtos, gerencie o estoque ',
         description: 'Organize seu catálogo, acompanhe entradas e saídas e mantenha a operação mais simples no dia a dia.',
         image: slide02,
       },
