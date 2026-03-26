@@ -62,7 +62,7 @@ const homeCarouselContent: Record<Locale, HomeCarouselContent> = {
         image: slide04,
       },
       {
-        title: 'Controle de Produtos Simplificado',
+         title: 'Controle de Produtos',
         subtitle: 'Cadastro, edição e gestão em um só painel',
         description: 'Gerencie categorias, preços e descrições com fluxo rápido para manter seu catálogo sempre atualizado.',
         image: slide02,
