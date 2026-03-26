@@ -50,7 +50,7 @@ const homeCarouselContent: Record<Locale, HomeCarouselContent> = {
         image: slide01,
       },
       {
-        title: 'Integração Segura',
+        title: 'Integração Segura ',
         subtitle: 'Conecte bots, apps e processos internos com facilidade',
         description: 'Conecte bots, apps e fluxos internos com estabilidade e privacidade total.',
         image: slide03,
