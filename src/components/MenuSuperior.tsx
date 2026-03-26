@@ -177,6 +177,19 @@ const MenuSuperior = () => {
                 )}
               </nav>
 
+              {user && (
+                <Link to="/dashboard" className="lg:hidden">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 rounded-lg px-3 text-xs font-medium bg-background text-foreground border-border hover:bg-muted"
+                  >
+                    <PanelLeft className="mr-1.5 h-3.5 w-3.5" />
+                    {content.sidebarOnlinePanels}
+                  </Button>
+                </Link>
+              )}
+
               {user ? (
                 <>
                   <UserWalletDropdown onLogout={handleLogout} />
