@@ -218,7 +218,7 @@ const MenuSuperior = () => {
               )}
             </div>
 
-            <div className="md:hidden flex items-center gap-3">
+            <div className="md:hidden ml-2 flex items-center gap-3">
               {user && (
                 <UserWalletDropdown onLogout={handleLogout} />
               )}
