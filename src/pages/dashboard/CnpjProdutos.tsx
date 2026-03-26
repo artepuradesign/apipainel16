@@ -897,23 +897,10 @@ const CnpjProdutos = () => {
       <SimpleTitleBar
         title="CNPJ Produtos"
         subtitle="Controle completo de produtos das empresas"
+        useModuleMetadata={false}
         icon={<Package className="h-4 w-4 sm:h-5 sm:w-5" />}
         right={
           <>
-            {!showManagementSection ? (
-              <Badge variant="secondary" className="text-xs">
-                Módulo #{MODULE_ID}
-              </Badge>
-            ) : null}
-            {!showManagementSection ? (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigate('/dashboard/cnpj-gerenciamento-produtos')}
-              >
-                Gerenciamento
-              </Button>
-            ) : null}
             <Button variant="ghost" size="sm" onClick={loadProdutos} disabled={loading} className="h-8 w-8 p-0">
               <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             </Button>

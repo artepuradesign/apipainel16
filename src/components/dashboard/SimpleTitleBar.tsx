@@ -16,6 +16,7 @@ interface SimpleTitleBarProps {
   onBack: () => void;
   icon?: React.ReactNode;
   right?: React.ReactNode;
+  useModuleMetadata?: boolean;
 }
 
 const SimpleTitleBar = ({
@@ -24,6 +25,7 @@ const SimpleTitleBar = ({
   onBack,
   icon,
   right,
+  useModuleMetadata = true,
 }: SimpleTitleBarProps) => {
   const location = useLocation();
   const { modules } = useApiModules();
@@ -109,8 +111,8 @@ const SimpleTitleBar = ({
   // Obter a cor do módulo
   const moduleColor = currentModule?.color || null;
 
-  const displayTitle = moduleTitle || title;
-  const displaySubtitle = moduleDescription || subtitle;
+  const displayTitle = useModuleMetadata ? (moduleTitle || title) : title;
+  const displaySubtitle = useModuleMetadata ? (moduleDescription || subtitle) : subtitle;
 
   // Gerar estilos dinâmicos baseados na cor do módulo
   const getIconStyles = () => {
