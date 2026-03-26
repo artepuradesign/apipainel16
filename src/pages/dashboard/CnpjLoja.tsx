@@ -233,9 +233,6 @@ const CnpjLoja = () => {
         }
         right={
           <>
-            <Badge variant="secondary" className="text-xs">
-              Módulo #{MODULE_ID}
-            </Badge>
             <Button variant="ghost" size="sm" onClick={loadProdutos} disabled={loading} className="h-8 w-8 p-0">
               <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             </Button>
