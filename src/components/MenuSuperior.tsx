@@ -43,7 +43,6 @@ const MenuSuperior = () => {
   const content = localeContent[locale];
   const selectedLanguageOption = languageOptions.find((option) => option.locale === locale) ?? languageOptions[0];
 
-  const isDashboardPage = location.pathname.startsWith('/dashboard');
   const isHomePage = location.pathname === '/';
 
   const toggleMenu = () => {
@@ -152,12 +151,6 @@ const MenuSuperior = () => {
                     <Button variant="ghost" size="sm" className={cn("text-muted-foreground hover:text-foreground", liquidGlassConfig.enabled && "hover:bg-white/10")}>{content.home}</Button>
                   </Link>
                 )}
-                <Link to="/modulos">
-                  <Button variant="ghost" size="sm" className={cn("text-muted-foreground hover:text-foreground", liquidGlassConfig.enabled && "hover:bg-white/10")}>{content.modules}</Button>
-                </Link>
-                <Link to="/planos-publicos">
-                  <Button variant="ghost" size="sm" className={cn("text-muted-foreground hover:text-foreground", liquidGlassConfig.enabled && "hover:bg-white/10")}>{content.plans}</Button>
-                </Link>
                 {user && (
                   <Link to="/dashboard">
                     <Button
@@ -168,11 +161,6 @@ const MenuSuperior = () => {
                       <PanelLeft className="mr-1.5 h-3.5 w-3.5" />
                       {content.sidebarOnlinePanels}
                     </Button>
-                  </Link>
-                )}
-                {!isDashboardPage && (
-                  <Link to="/dashboard">
-                    <Button variant="ghost" size="sm" className={cn("menu-paineis-link text-muted-foreground hover:text-foreground font-semibold", liquidGlassConfig.enabled && "hover:bg-white/10")}>{content.panels}</Button>
                   </Link>
                 )}
               </nav>
