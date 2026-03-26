@@ -51,7 +51,7 @@ const homeCarouselContent: Record<Locale, HomeCarouselContent> = {
       },
       {
         title: 'Integração Segura ',
-        subtitle: 'Conecte bots, apps e processos internos com facilidade',
+        subtitle: 'Conecte bots, apps e processos internos',
         description: 'Conecte bots, apps e fluxos internos com estabilidade e privacidade total.',
         image: slide03,
       },
